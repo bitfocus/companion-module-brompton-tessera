@@ -1,0 +1,27 @@
+{
+	"name": "brompton-tessera",
+	"version": "1.0.0",
+	"api_version": "1.0.0",
+	"description": "Brompton Technology Tessera LED Processor Control",
+	"keywords": [
+		"brompton",
+		"tessera",
+		"processor",
+		"control",
+		"led",
+		"panel"
+	],
+	"manufacturer": "Brompton Technology",
+	"product": "Tessera LED Processor Control",
+	"shortname": "Tessera",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Rahil Baber <rahilb@carallon.com>",
+	"contributors": [],
+	"license": "MIT",
+	"devDependencies": {
+		"prettier": "2.3.2"
+	}
+}
