@@ -1,2 +1,9 @@
 package.json
-/LICENSE.md
+package-lock.json
+LICENSE
+README.md
+HELP.md
+.prettierrc
+.gitignore
+.git/
+node_modules/
