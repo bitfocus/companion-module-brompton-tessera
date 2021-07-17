@@ -20,8 +20,5 @@
 	},
 	"author": "Rahil Baber <rahilb@carallon.com>",
 	"contributors": [],
-	"license": "MIT",
-	"devDependencies": {
-		"prettier": "2.3.2"
-	}
+	"license": "MIT"
 }
