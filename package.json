@@ -20,5 +20,13 @@
 	},
 	"author": "Rahil Baber <rahilb@carallon.com>",
 	"contributors": [],
-	"license": "MIT"
+	"license": "MIT",
+	"homepage": "https://github.com/bitfocus/companion-module-brompton-tessera#readme",
+	"bugs": {
+		"url": "https://github.com/bitfocus/companion-module-brompton-tessera/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/bitfocus/companion-module-brompton-tessera.git"
+	}
 }
