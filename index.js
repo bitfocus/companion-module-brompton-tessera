@@ -200,7 +200,8 @@ instance.prototype.initVariables = function () {
 			apiKey: self.apiKeyOutputBrightness,
 		},
 		{
-			definition: { label: 'Output Brightness %', name: 'outputBrightnessPercentage' }
+			definition: { label: 'Output Brightness %', name: 'outputBrightnessPercentage' },
+			apiKey: self.apiKeyOutputBrightness
 		},
 		{
 			definition: { label: 'Blackout', name: 'blackout' },
