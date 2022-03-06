@@ -200,6 +200,9 @@ instance.prototype.initVariables = function () {
 			apiKey: self.apiKeyOutputBrightness,
 		},
 		{
+			definition: { label: 'Output Brightness %', name: 'outputBrightnessPercentage' }
+		},
+		{
 			definition: { label: 'Blackout', name: 'blackout' },
 			apiKey: self.apiKeyBlackout,
 			transform: convertBool,
@@ -324,6 +327,17 @@ instance.prototype.updateVariables = function (state) {
 				result = info.transform(result)
 			}
 		}
+
+		//THIS ADDS SUPPORT FOR OUTPUT BRIGHTNESS PERCENTAGE BY TAKING OUTPUT BRIGHTNESS DIVIDED BY MAX BRIGHTNESS
+		if (info.definition.name === 'outputBrightnessPercentage') {
+			let result = getProperty(state, self.apiKeyOutputBrightness)
+			if (result === undefined) {
+				result = '?'
+			} else {
+				result = (parseInt(result) / self.maxBrightness) * 100; //output brightness divided by max brightness, multiplied by 100
+			}
+		}
+		//////
 
 		self.setVariable(info.definition.name, result)
 	}

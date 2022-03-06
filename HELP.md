@@ -17,6 +17,7 @@ Upon launch enter the IP of the LED processor you wish to monitor and control.
 - inputPortNumber
 - inputPortType
 - outputBrightness
+- outputBrightnessPercentage
 - groupBrightness1, groupBrightness2, etc. (These will only be visible to the companion app after a successful connection to the processor.)
 
 ### Available commands
