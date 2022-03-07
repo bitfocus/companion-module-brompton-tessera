@@ -331,7 +331,7 @@ instance.prototype.updateVariables = function (state) {
 
 		//THIS ADDS SUPPORT FOR OUTPUT BRIGHTNESS PERCENTAGE BY TAKING OUTPUT BRIGHTNESS DIVIDED BY MAX BRIGHTNESS
 		if (info.definition.name === 'outputBrightnessPercentage') {
-			let result = getProperty(state, self.apiKeyOutputBrightness)
+			result = getProperty(state, self.apiKeyOutputBrightness)
 			if (result === undefined) {
 				result = '?'
 			} else {
