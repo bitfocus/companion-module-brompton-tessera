@@ -342,7 +342,8 @@ instance.prototype.updateVariables = function (state) {
 			if (result === undefined) {
 				result = '?'
 			} else {
-				result = (parseInt(result) / parseInt(self.config.maxBrightness))* 100; //output brightness divided by max brightness, multiplied by 100
+				result = (parseInt(result) / parseInt(self.config.maxBrightness)) * 100; //output brightness divided by max brightness, multiplied by 100
+				result = Math.round(result, 1); //rounds to 1 decimal place
 			}
 		}
 		//////
