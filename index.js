@@ -343,7 +343,7 @@ instance.prototype.updateVariables = function (state) {
 				result = '?'
 			} else {
 				result = (parseInt(result) / parseInt(self.config.maxBrightness)) * 100; //output brightness divided by max brightness, multiplied by 100
-				result = Math.round(result, 1); //rounds to 1 decimal place
+				result = result.toFixed(1); //rounds to 1 decimal place
 			}
 		}
 		//////
