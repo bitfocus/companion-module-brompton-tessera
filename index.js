@@ -14,6 +14,12 @@ const defaultBrightness = 5000
 const minBrightnessStep = 1
 const maxBrightnessStep = maxBrightness
 const defaultBrightnessStep = 100
+const minColourTemp = 2000
+const maxColourTemp = 11000
+const defaultColourTemp = 6500
+const minColourTempStep = 1
+const maxColourTempStep = maxColourTemp
+const defaultColourTempStep = 100
 const minGroupNumber = 1
 const maxGroupNumber = Math.pow(2, 32) - 1
 
@@ -185,6 +191,7 @@ instance.prototype.initVariables = function () {
 	self.apiKeyActivePresetNumber = ['api', 'presets', 'active', 'number']
 	self.apiKeyActivePresetName = ['api', 'presets', 'active', 'name']
 	self.apiKeyOutputBrightness = ['api', 'output', 'global-colour', 'brightness']
+	self.apiKeyOutputColourTemperature = ['api', 'output', 'global-colour', 'colour-temperature']
 	self.apiKeyBlackout = ['api', 'override', 'blackout', 'enabled']
 	self.apiKeyFreeze = ['api', 'override', 'freeze', 'enabled']
 	self.apiKeyTestPattern = ['api', 'override', 'test-pattern', 'enabled']
@@ -209,6 +216,10 @@ instance.prototype.initVariables = function () {
 		{
 			definition: { label: 'Output Brightness %', name: 'outputBrightnessPercentage' },
 			apiKey: self.apiKeyOutputBrightness
+		},
+		{	
+			definition: { label: 'Output Colour Temperature', name: 'outputColourTemperature' },
+			apiKey: self:apiKeyOutputColourTemperature
 		},
 		{
 			definition: { label: 'Blackout', name: 'blackout' },
@@ -394,6 +405,8 @@ instance.prototype.initActions = function (system) {
 	const presetRange = rangeToString(minPreset, maxPreset)
 	const brightnessRange = rangeToString(minBrightness, maxBrightness)
 	const brightnessStepRange = rangeToString(minBrightnessStep, maxBrightnessStep)
+	const colorTempRange = rangeToString(minColourTemp, maxColourTemp)
+	const colourTempStepRange = rangeToString(minColourTempStep, maxColourTempStep)
 
 	self.setActions({
 		presetSelect: {
@@ -470,6 +483,57 @@ instance.prototype.initActions = function (system) {
 					min: minBrightnessStep,
 					max: maxBrightnessStep,
 					default: defaultBrightnessStep,
+					step: 1,
+					required: true,
+					range: false,
+				},
+			],
+		},
+		outputColourTemperatureSelect: {
+			label: 'Output Colour Temperature Select',
+			options: [
+				{
+					type: 'number',
+					label: 'Colour Temperature ' + colorTempRange,
+					id: 'colourTemperature',
+					tooltip: 'The output color temperature ' + colorTempRange,
+					min: minColourTemp,
+					max: maxColourTemp,
+					default: defaultColourTemp,
+					step: 1,
+					required: true,
+					range: false,
+				},
+			],
+		},
+		outputColourTemperatureIncrease: {
+			label: 'Output Colour Temperature Increase',
+			options: [
+				{
+					type: 'number',
+					label: 'Increase Amount ' + colourTempStepRange,
+					id: 'step',
+					tooltip: 'How much to increase by ' + colourTempStepRange,
+					min: minColourTempStep,
+					max: maxColourTempStep,
+					default: defaultColourTempStep,
+					step: 1,
+					required: true,
+					range: false,
+				},
+			],
+		},
+		outputColourTemperatureDecrease: {
+			label: 'Output Colour Temperature Decrease',
+			options: [
+				{
+					type: 'number',
+					label: 'Decrease Amount ' + colourTempStepRange,
+					id: 'step',
+					tooltip: 'How much to decrease by ' + colourTempStepRange,
+					min: minColourTempStep,
+					max: maxColourTempStep,
+					default: defaultColourTempStep,
 					step: 1,
 					required: true,
 					range: false,
@@ -792,6 +856,40 @@ instance.prototype.action = function (action) {
 			brightness = clamp(brightness, minBrightness, maxBrightness)
 
 			self.setProcessorProperty(self.apiKeyOutputBrightness, brightness)
+		}
+
+		if (action.action == 'outputColourTemperatureIncrease') {
+			validate(action.options.colourTemperature, minColourTemp, maxColourTemp, 'Colour Temperature')
+			self.setProcessorProperty(self.apiKeyOutputColourTemperature, action.options.colourTemperature)
+		}
+
+		if (action.action == 'outputColourTemperatureIncrease' || action.action == 'outputColourTemperatureDecrease') {
+			let description
+			if (action.action == 'outputColourTemperatureIncrease') {
+				description = 'Increase Amount'
+			} else {
+				description = 'Decrease Amount'
+			}
+
+			validate(action.options.step, minColourTempStep, maxColourTempStep, description)
+
+			let temperature = getProperty(self.state, self.apiKeyOutputColourTemperature)
+
+			if (temperature === undefined) {
+				throw new Error('Output Colour Temperature is not available')
+			}
+
+			temperature = parseInt(temperature)
+
+			if (action.action == 'outputColourTemperatureIncrease') {
+				temperature += action.options.step
+			} else {
+				temperature -= action.options.step
+			}
+
+			temperature = clamp(temperature, minColourTemp, maxColourTemp)
+
+			self.setProcessorProperty(self.apiKeyOutputColourTemperature, temperature)
 		}
 
 		if (action.action == 'groupBrightnessSelect') {
