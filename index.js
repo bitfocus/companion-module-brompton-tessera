@@ -17,6 +17,13 @@ const defaultBrightnessStep = 100
 const minGroupNumber = 1
 const maxGroupNumber = Math.pow(2, 32) - 1
 
+//added constants below
+const minTemperature = 2000
+const maxTemperature = 11000
+const minTemperatureStep = 1
+const maxTemperatureStep = maxTemperature
+const defaultTemperatureStep = 100
+
 function instance(system, id, config) {
 	let self = this
 
@@ -185,6 +192,16 @@ instance.prototype.initVariables = function () {
 	self.apiKeyActivePresetNumber = ['api', 'presets', 'active', 'number']
 	self.apiKeyActivePresetName = ['api', 'presets', 'active', 'name']
 	self.apiKeyOutputBrightness = ['api', 'output', 'global-colour', 'brightness']
+//added global-colour variables
+	self.apikeyOutputTemperature = ['api', 'output', 'global-colour', 'colour-temperature']
+	self.apikeyDarkMagic = ['api', 'output', 'global-colour', 'dark-magic']
+	self.apikeyExtendedBitDepth = ['api', 'output', 'global-colour', 'extended-bit-depth']
+	self.apikeyPureTone = ['api', 'output', 'global-colour', 'puretone']
+//added network variables
+	//self.apikeyBitDepth = ['api', 'output', 'network', 'bit-depth']
+	//self.apikeyCableRedundancy = ['api', 'output', 'network', 'cable-redundancy', 'loops', ] not sure about th eformatting on this
+	//self.apikeyFailover
+	
 	self.apiKeyBlackout = ['api', 'override', 'blackout', 'enabled']
 	self.apiKeyFreeze = ['api', 'override', 'freeze', 'enabled']
 	self.apiKeyTestPattern = ['api', 'override', 'test-pattern', 'enabled']
@@ -192,7 +209,7 @@ instance.prototype.initVariables = function () {
 	self.apiKeyTestPatternType = ['api', 'override', 'test-pattern', 'type']
 	self.apiKeyInputPortNumber = ['api', 'input', 'active', 'source', 'port-number']
 	self.apiKeyInputPortType = ['api', 'input', 'active', 'source', 'port-type']
-
+	
 	self.variableInfo = [
 		{
 			definition: { label: 'Active Preset Number', name: 'activePresetNumber' },
@@ -205,6 +222,25 @@ instance.prototype.initVariables = function () {
 		{
 			definition: { label: 'Output Brightness', name: 'outputBrightness' },
 			apiKey: self.apiKeyOutputBrightness,
+		},
+		{
+			definition: { label: 'Output Temperature', name: 'outputTemperature' },
+			apiKey: self.apiKeyOutputTemperature,
+		},
+		{
+			definition: { label: 'Dark Magic', name: 'darkMagic' },
+			apiKey: self.apiKeyDarkMagic,
+			transform: convertBool,
+		},
+		{
+			definition: { label: 'Extended Bit Depth', name: 'extendedBitDepth' },
+			apiKey: self.apiKeyExtendedBitDepth,
+			transform: convertBool,
+		},
+		{
+			definition: { label: 'PureTone', name: 'pureTone' },
+			apiKey: self.apiKeyPureTone,
+			transform: convertBool,
 		},
 		{
 			definition: { label: 'Output Brightness %', name: 'outputBrightnessPercentage' },
@@ -476,6 +512,57 @@ instance.prototype.initActions = function (system) {
 				},
 			],
 		},
+		outputTemperatureSelect: {
+			label: 'Output Temperature Select',
+			options: [
+				{
+					type: 'number',
+					label: 'Temperature ' + temperatureRange,
+					id: 'temperature',
+					tooltip: 'The output temperature ' + temperatureRange,
+					min: minTemperature,
+					max: maxTemperature,
+					default: defaultTemperature,
+					step: 1,
+					required: true,
+					range: false,
+				},
+			],
+		},
+		outputTemperatureIncrease: {
+			label: 'Output Temperature Increase',
+			options: [
+				{
+					type: 'number',
+					label: 'Increase Amount ' + temperatureStepRange,
+					id: 'step',
+					tooltip: 'How much to increase by ' + temperatureStepRange,
+					min: minTemperatureStep,
+					max: maxTemperatureStep,
+					default: defaultTemperatureStep,
+					step: 1,
+					required: true,
+					range: false,
+				},
+			],
+		},
+		outputTemperatureDecrease: {
+			label: 'Output Temperature Decrease',
+			options: [
+				{
+					type: 'number',
+					label: 'Decrease Amount ' + temperatureStepRange,
+					id: 'step',
+					tooltip: 'How much to decrease by ' + temperatureStepRange,
+					min: minTemperatureStep,
+					max: maxTemperatureStep,
+					default: defaultTemperatureStep,
+					step: 1,
+					required: true,
+					range: false,
+				},
+			],
+		},			
 		groupBrightnessSelect: {
 			label: 'Group Brightness Select',
 			options: [
@@ -688,6 +775,10 @@ instance.prototype.initActions = function (system) {
 				},
 			],
 		},
+//NEW KEYS		
+		
+
+		
 	})
 }
 
