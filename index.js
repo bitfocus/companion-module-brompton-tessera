@@ -265,6 +265,35 @@ class BromptonInstance extends InstanceBase {
 				apiKey: apiKeys.inputPortType,
 			},
 			// Processing
+			{
+				definition: { name: 'Scaler', variableId: 'scaler' },
+				apiKey: apiKeys.scaler,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Colour Replace', variableId: 'colourReplace' },
+				apiKey: apiKeys.colourReplace,
+				transform: convertBool,
+			},
+			{
+				definition: { name: '14-Way Colour Correct', variableId: 'colourCorrect' },
+				apiKey: apiKeys.colourCorrect,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Curves', variableId: 'curves' },
+				apiKey: apiKeys.curves,
+				transform: convertBool,
+			},
+			{
+				definition: { name: '3D LUT', variableId: 'lut' },
+				apiKey: apiKeys.lut3d,
+				transform: convertBool,
+			},
+			{
+				definition: { name: '3D LUT Strength', variableId: 'lutStrength' },
+				apiKey: apiKeys.lut3dStrength,
+			},
 			// Override
 			{
 				definition: { name: 'Blackout', variableId: 'blackout' },
@@ -490,6 +519,167 @@ class BromptonInstance extends InstanceBase {
 			},
 
 			// Processing
+			scalerToggle: {
+				name: 'Scaler Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Scaler toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.scaler, 'Scaler')
+				},
+			},
+			colourReplaceToggle: {
+				name: 'Colour Replace Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Colour replace toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.colourReplace, 'Colour Replace')
+				},
+			},
+			colourCorrectToggle: {
+				name: '14-Way Colour Correct Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: '14-Way colour correct toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.colourCorrect, '14-Way Colour Correct')
+				},
+			},
+			curvesToggle: {
+				name: 'Curves Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Curves toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.curves, 'Curves')
+				},
+			},
+			lutToggle: {
+				name: '3D LUT Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: '14-Way Colour Correct toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.lut3d, '3D LUT')
+				},
+			},
+			lutStrengthIncrease: {
+				name: '3D LUT Strength Increase',
+				options: [
+					{
+						type: 'number',
+						label: 'Increase Amount (%)',
+						id: 'step',
+						tooltip: 'How much to increase by (%)',
+						min: 0.1,
+						max: 100,
+						default: 50,
+						step: 0.1,
+						required: true,
+						range: false,
+					},
+				],
+				callback: (action, controlId) => {
+					this.lutStrengthIncreaseOrDecreaseAction(action)
+				},
+			},
+			lutStrengthDecrease: {
+				name: '3D LUT Strength Decrease',
+				options: [
+					{
+						type: 'number',
+						label: 'Decrease Amount (%)',
+						id: 'step',
+						tooltip: 'How much to decrease by (%)',
+						min: 0.0,
+						max: 100,
+						default: 50,
+						step: 0.1,
+						required: true,
+						range: false,
+					},
+				],
+				callback: (action, controlId) => {
+					this.lutStrengthIncreaseOrDecreaseAction(action)
+				},
+			},
+			lutStrengthSelect: {
+				name: '3D LUT Strength Select',
+				options: [
+					{
+						type: 'number',
+						label: '3D LUT Strength (%)',
+						id: 'strength',
+						tooltip: '3D LUT Strength (%)',
+						min: 0.0,
+						max: 100,
+						default: 50,
+						step: 0.1,
+						required: true,
+						range: false,
+					},
+				],
+				callback: (action, controlId) => {
+					this.setValidatedProperty(action.options.strength, 0, 100, 'Strength', apiKeys.lut3dStrength)
+				},
+			},
+
 			// Override
 			blackoutToggle: {
 				name: 'Blackout Toggle/Enable/Disable',
@@ -952,6 +1142,37 @@ class BromptonInstance extends InstanceBase {
 
 	// Input
 	// Processing
+	lutStrengthIncreaseOrDecreaseAction(action) {
+		try {
+			let description = getActionDescription(action.actionId)
+
+			validate(action.options.step, 0, 100, description)
+
+			let strength = getProperty(this.state, apiKeys.lut3dStrength)
+
+			if (strength === undefined) {
+				throw new Error('3D LUT strength is not available')
+			}
+
+			strength = parseInt(strength)
+
+			if (action.actionId == 'lutStrengthIncrease') {
+				strength += action.options.step
+			} else {
+				strength -= action.options.step
+			}
+
+			strength = clamp(strength, 0, 100)
+
+			this.setProcessorProperty(apiKeys.lut3dStrength, strength)
+		} catch (error) {
+			let msg = 'Action ' + action.actionId + ' failed'
+			if (error.message && error.message.length > 0) {
+				msg += ' (' + error.message + ')'
+			}
+			this.log('error', msg)
+		}
+	}
 
 	// Override
 	// Colour & Output
