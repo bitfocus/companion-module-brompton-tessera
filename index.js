@@ -1237,6 +1237,14 @@ class BromptonInstance extends InstanceBase {
 			},
 
 			// Network
+			requestFailover: {
+				name: 'Request Failover',
+				options: [],
+				callback: (action, controlId) => {
+					this.setProcessorProperty(apiKeys.requestFailover, '')
+				},
+			},
+
 			// Camera
 			phaseOffsetModeSelect: {
 				name: 'Phase Offset Mode Select',

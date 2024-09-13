@@ -29,6 +29,7 @@ const apiKeys = {
 	outputColourTemperature: ['api', 'output', 'global-colour', 'colour-temperature'],
 
 	// Network
+	requestFailover: ['api', 'output', 'network', 'failover', 'actions', 'request-failover'],
 
 	// Camera
 	phaseOffsetMode: ['api', 'output', 'network', 'genlock', 'phase-offset', 'mode'],
