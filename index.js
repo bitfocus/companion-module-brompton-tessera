@@ -2,6 +2,7 @@
 
 const { InstanceBase, Regex, runEntrypoint, InstanceStatus } = require('@companion-module/base')
 const request = require('request')
+const UpdatePresets = require('./presets')
 const { apiKeys } = require('./apiKeys.js')
 
 // Constants
@@ -133,6 +134,7 @@ class BromptonInstance extends InstanceBase {
 
 		this.initVariables()
 		this.initActions()
+		this.updatePresets() // export presets
 		this.startPolling()
 	}
 
@@ -2123,6 +2125,10 @@ class BromptonInstance extends InstanceBase {
 			}
 			this.log('error', msg)
 		}
+	}
+
+	updatePresets() {
+		UpdatePresets(this)
 	}
 }
 
