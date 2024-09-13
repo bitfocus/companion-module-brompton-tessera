@@ -130,7 +130,7 @@ class BromptonInstance extends InstanceBase {
 			if (self.loggedError === false) {
 				let msg = 'IP is not set'
 				self.log('error', msg)
-				self.updateStatus('bad_config', msg)
+				self.updateStatus(InstanceStatus.BadConfig, msg)
 				self.loggedError = true
 			}
 
@@ -165,7 +165,7 @@ class BromptonInstance extends InstanceBase {
 					}
 
 					self.log('error', msg)
-					self.updateStatus('connection_failure', msg)
+					self.updateStatus(InstanceStatus.ConnectionFailure, msg)
 					self.loggedError = true
 				}
 				self.updateVariables({})
@@ -175,7 +175,7 @@ class BromptonInstance extends InstanceBase {
 			// Made a successful request.
 			if (self.loggedError === true) {
 				self.log('info', 'HTTP connection succeeded')
-				self.updateStatus('ok')
+				self.updateStatus(InstanceStatus.Ok)
 				self.loggedError = false
 			}
 
