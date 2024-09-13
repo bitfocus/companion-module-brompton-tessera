@@ -197,7 +197,7 @@ class BromptonInstance extends InstanceBase {
 				type: 'textinput',
 				id: 'ip',
 				label: 'IP',
-				default: '',
+				default: '192.168.0.50',
 				width: 12,
 				regex: Regex.IP,
 			},
