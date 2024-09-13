@@ -10,6 +10,7 @@ const apiKeys = {
 	testPatternType: ['api', 'override', 'test-pattern', 'type'],
 	// Colour & Output
 	outputBrightness: ['api', 'output', 'global-colour', 'brightness'],
+	outputColourTemperature: ['api', 'output', 'global-colour', 'colour-temperature'],
 
 	// Network
 

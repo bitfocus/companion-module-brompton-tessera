@@ -15,15 +15,15 @@ const defaultBrightness = 5000
 const minBrightnessStep = 1
 const maxBrightnessStep = maxBrightness
 const defaultBrightnessStep = 100
+
+const defaultColourTemperature = 6504
+const minColourTemperature = 2000
+const maxColourTemperature = 11000
+const minColourTemperatureStep = 1
+const maxColourTemperatureStep = maxColourTemperature - minColourTemperature
+const defaultColourTemperatureStep = 100
 const minGroupNumber = 1
 const maxGroupNumber = Math.pow(2, 32) - 1
-
-//added constants below
-const minTemperature = 2000
-const maxTemperature = 11000
-const minTemperatureStep = 1
-const maxTemperatureStep = maxTemperature
-const defaultTemperatureStep = 100
 
 function getProperty(object, path) {
 	return path.reduce((object, label) => object && object[label], object)
@@ -299,8 +299,8 @@ class BromptonInstance extends InstanceBase {
 				apiKey: apiKeys.outputBrightness,
 			},
 			{
-				definition: { label: 'Output Temperature', name: 'outputTemperature' },
-				apiKey: self.apiKeyOutputTemperature,
+				definition: { name: 'Output Colour Temperature', variableId: 'outputColourTemperature' },
+				apiKey: apiKeys.outputColourTemperature,
 			},
 			// Network
 			// Camera
@@ -444,6 +444,8 @@ class BromptonInstance extends InstanceBase {
 		const presetRange = rangeToString(minPreset, maxPreset)
 		const brightnessRange = rangeToString(minBrightness, maxBrightness, 'nits')
 		const brightnessStepRange = rangeToString(minBrightnessStep, maxBrightnessStep, 'nits')
+		const colourTemperatureRange = rangeToString(minColourTemperature, maxColourTemperature, 'K')
+		const colourTemperatureStepRange = rangeToString(minColourTemperatureStep, maxColourTemperatureStep, 'K')
 
 		self.setActionDefinitions({
 			// Input
@@ -685,56 +687,71 @@ class BromptonInstance extends InstanceBase {
 					this.outputBrightnessIncreaseOrDecreaseAction(action)
 				},
 			},
-			outputTemperatureSelect: {
-				label: 'Output Temperature Select',
+			outputColourTemperatureSelect: {
+				name: 'Output Colour Temperature Select',
 				options: [
 					{
 						type: 'number',
-						label: 'Temperature ' + temperatureRange,
+						label: 'Colour Temperature ' + colourTemperatureRange,
 						id: 'temperature',
-						tooltip: 'The output temperature ' + temperatureRange,
-						min: minTemperature,
-						max: maxTemperature,
-						default: defaultTemperature,
+						tooltip: 'The output colour temperature ' + colourTemperatureRange,
+						min: minColourTemperature,
+						max: maxColourTemperature,
+						default: defaultColourTemperature,
 						step: 1,
 						required: true,
 						range: false,
 					},
 				],
+				callback: (action, controlId) => {
+					this.setValidatedProperty(
+						action.options.temperature,
+						minColourTemperature,
+						maxColourTemperature,
+						'Colour Temperature',
+						apiKeys.outputColourTemperature
+					)
+				},
 			},
-			outputTemperatureIncrease: {
-				label: 'Output Temperature Increase',
+			outputColourTemperatureIncrease: {
+				name: 'Output Colour Temperature Increase',
 				options: [
 					{
 						type: 'number',
-						label: 'Increase Amount ' + temperatureStepRange,
+						label: 'Increase Amount ' + colourTemperatureStepRange,
 						id: 'step',
-						tooltip: 'How much to increase by ' + temperatureStepRange,
-						min: minTemperatureStep,
-						max: maxTemperatureStep,
-						default: defaultTemperatureStep,
+						tooltip: 'How much to increase by ' + colourTemperatureStepRange,
+						min: minColourTemperatureStep,
+						max: maxColourTemperatureStep,
+						default: defaultColourTemperatureStep,
 						step: 1,
 						required: true,
 						range: false,
 					},
 				],
+				callback: (action, controlId) => {
+					this.outputColourTemperatureIncreaseOrDecreaseAction(action)
+				},
 			},
-			outputTemperatureDecrease: {
-				label: 'Output Temperature Decrease',
+			outputColourTemperatureDecrease: {
+				name: 'Output Colour Temperature Decrease',
 				options: [
 					{
 						type: 'number',
-						label: 'Decrease Amount ' + temperatureStepRange,
+						label: 'Decrease Amount ' + colourTemperatureStepRange,
 						id: 'step',
-						tooltip: 'How much to decrease by ' + temperatureStepRange,
-						min: minTemperatureStep,
-						max: maxTemperatureStep,
-						default: defaultTemperatureStep,
+						tooltip: 'How much to decrease by ' + colourTemperatureStepRange,
+						min: minColourTemperatureStep,
+						max: maxColourTemperatureStep,
+						default: defaultColourTemperatureStep,
 						step: 1,
 						required: true,
 						range: false,
 					},
 				],
+				callback: (action, controlId) => {
+					this.outputColourTemperatureIncreaseOrDecreaseAction(action)
+				},
 			},
 
 			// Network
@@ -969,6 +986,39 @@ class BromptonInstance extends InstanceBase {
 			this.log('error', msg)
 		}
 	}
+
+	outputColourTemperatureIncreaseOrDecreaseAction(action) {
+		try {
+			let description = getActionDescription(action.actionId)
+
+			validate(action.options.step, minColourTemperatureStep, maxColourTemperatureStep, description)
+
+			let colourTemperature = getProperty(this.state, apiKeys.outputColourTemperature)
+
+			if (colourTemperature === undefined) {
+				throw new Error('Output Colour Temperature is not available')
+			}
+
+			colourTemperature = parseInt(colourTemperature)
+
+			if (action.actionId == 'outputColourTemperatureIncrease') {
+				colourTemperature += action.options.step
+			} else {
+				colourTemperature -= action.options.step
+			}
+
+			colourTemperature = clamp(colourTemperature, minColourTemperature, maxColourTemperature)
+
+			this.setProcessorProperty(apiKeys.outputColourTemperature, colourTemperature)
+		} catch (error) {
+			let msg = 'Action ' + action.actionId + ' failed'
+			if (error.message && error.message.length > 0) {
+				msg += ' (' + error.message + ')'
+			}
+			this.log('error', msg)
+		}
+	}
+
 	// Network
 	// Camera
 
