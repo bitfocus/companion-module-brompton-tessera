@@ -22,6 +22,26 @@ const maxColourTemperature = 11000
 const minColourTemperatureStep = 1
 const maxColourTemperatureStep = maxColourTemperature - minColourTemperature
 const defaultColourTemperatureStep = 100
+
+const minPhaseOffsetAngle = -360
+const maxPhaseOffsetAngle = 360
+const minPhaseOffsetAngleStep = 0.0
+const maxPhaseOffsetAngleStep = maxPhaseOffsetAngle
+const defaultPhaseOffsetAngleStep = 0.1
+
+const minPhaseOffsetFraction = -100
+const maxPhaseOffsetFraction = 100
+const minPhaseOffsetFractionStep = 0.0
+const maxPhaseOffsetFractionStep = maxPhaseOffsetFraction
+const defaultPhaseOffsetFractionStep = 0.1
+
+const minShutterSyncAngle = 1
+const maxShutterSyncAngle = 360
+const minShutterSyncSpeed = 10
+const maxShutterSyncSpeed = 250
+const minShutterSyncTime = 4
+const maxShutterSyncTime = 100
+
 const minGroupNumber = 1
 const maxGroupNumber = Math.pow(2, 32) - 1
 
@@ -378,6 +398,53 @@ class BromptonInstance extends InstanceBase {
 			},
 			// Network
 			// Camera
+			{
+				definition: { name: 'Phase Offset Mode', variableId: 'phaseOffsetMode' },
+				apiKey: apiKeys.phaseOffsetMode,
+			},
+			{
+				definition: { name: 'Phase Offset Angle', variableId: 'phaseOffsetAngle' },
+				apiKey: apiKeys.phaseOffsetAngle,
+			},
+			{
+				definition: { name: 'Phase Offset Fraction', variableId: 'phaseOffsetFraction' },
+				apiKey: apiKeys.phaseOffsetFraction,
+			},
+			{
+				definition: { name: 'ShutterSync Mode', variableId: 'shutterSyncMode' },
+				apiKey: apiKeys.shutterSyncMode,
+			},
+			{
+				definition: { name: 'ShutterSync Angle', variableId: 'shutterSyncAngle' },
+				apiKey: apiKeys.shutterSyncAngle,
+			},
+			{
+				definition: { name: 'ShutterSync Speed', variableId: 'shutterSyncSpeed' },
+				apiKey: apiKeys.shutterSyncSpeed,
+			},
+			{
+				definition: { name: 'ShutterSync Time', variableId: 'shutterSyncTime' },
+				apiKey: apiKeys.shutterSyncTime,
+			},
+			{
+				definition: { name: 'ShutterSync Prioritise Refresh Rate', variableId: 'shutterSyncPrioritiseRefreshRate' },
+				apiKey: apiKeys.shutterSyncPrioritiseRefreshRate,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Hidden Markers', variableId: 'hiddenMarkers' },
+				apiKey: apiKeys.hiddenMarkers,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Hidden Markers Mode', variableId: 'hiddenMarkersMode' },
+				apiKey: apiKeys.hiddenMarkersMode,
+			},
+			{
+				definition: { name: 'Frame Remapping', variableId: 'frameRemapping' },
+				apiKey: apiKeys.frameRemapping,
+				transform: convertBool,
+			},
 			// Presets
 			{
 				definition: { name: 'Active Preset Number', variableId: 'activePresetNumber' },
@@ -1171,6 +1238,333 @@ class BromptonInstance extends InstanceBase {
 
 			// Network
 			// Camera
+			phaseOffsetModeSelect: {
+				name: 'Phase Offset Mode Select',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'none',
+						tooltip: 'Phase offset mode',
+						choices: [
+							{ id: 'none', label: 'None' },
+							{ id: 'angle', label: 'Angle' },
+							{ id: 'fraction', label: 'Fraction' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.setProcessorProperty(apiKeys.phaseOffsetMode, action.options.mode)
+				},
+			},
+			phaseOffsetAngleSelect: {
+				name: 'Phase Offset (Angle) Select',
+				options: [
+					{
+						type: 'number',
+						label: 'Phase Offset Angle (' + minPhaseOffsetAngle + '˚ - ' + maxPhaseOffsetAngle + '˚)',
+						id: 'offset',
+						tooltip: 'The phase offset angle (' + minPhaseOffsetAngle + '˚ - ' + maxPhaseOffsetAngle + '˚)',
+						min: minPhaseOffsetAngle,
+						max: maxPhaseOffsetAngle,
+						default: 0.0,
+						step: 0.1,
+						required: true,
+						range: false,
+					},
+				],
+				callback: (action, controlId) => {
+					this.setValidatedPropertyFloat(
+						action.options.offset,
+						minPhaseOffsetAngle,
+						maxPhaseOffsetAngle,
+						'Phase Offset',
+						apiKeys.phaseOffsetAngle
+					)
+				},
+			},
+			phaseOffsetFractionSelect: {
+				name: 'Phase Offset (Fraction) Select',
+				options: [
+					{
+						type: 'number',
+						label: 'Phase Offset Fraction (' + minPhaseOffsetFraction + '% - ' + maxPhaseOffsetFraction + '%)',
+						id: 'offset',
+						tooltip: 'The phase offset fraction (' + minPhaseOffsetFraction + '% - ' + maxPhaseOffsetFraction + '%)',
+						min: minPhaseOffsetFraction,
+						max: maxPhaseOffsetFraction,
+						default: 0.0,
+						step: 0.1,
+						required: true,
+						range: false,
+					},
+				],
+				callback: (action, controlId) => {
+					this.setValidatedPropertyFloat(
+						action.options.offset,
+						minPhaseOffsetFraction,
+						maxPhaseOffsetFraction,
+						'Phase Offset',
+						apiKeys.phaseOffsetFraction
+					)
+				},
+			},
+			phaseOffsetIncrease: {
+				name: 'Phase Offset Increase',
+				options: [
+					{
+						type: 'number',
+						label: 'Increase Amount (Angle)',
+						id: 'angle',
+						tooltip: 'How much to increase by in degrees',
+						min: minPhaseOffsetAngleStep,
+						max: maxPhaseOffsetAngleStep,
+						default: defaultPhaseOffsetAngleStep,
+						step: 0.1,
+						required: true,
+						range: false,
+					},
+					{
+						type: 'number',
+						label: 'Increase Amount (%)',
+						id: 'fraction',
+						tooltip: 'How much to increase by as a %',
+						min: minPhaseOffsetFractionStep,
+						max: maxPhaseOffsetFractionStep,
+						default: defaultPhaseOffsetFractionStep,
+						step: 0.1,
+						required: true,
+						range: false,
+					},
+					{
+						id: 'wraparound',
+						label: 'Wrap-around?',
+						type: 'checkbox',
+						tooltip: 'If true, positive values will wrap around to 0 when the maximum value is exceeded.',
+						default: false,
+					},
+				],
+				callback: (action, controlId) => {
+					this.phaseOffsetIncreaseOrDecreaseAction(action)
+				},
+			},
+			phaseOffsetDecrease: {
+				name: 'Phase Offset Decrease',
+				options: [
+					{
+						type: 'number',
+						label: 'Decrease Amount (Angle)',
+						id: 'angle',
+						tooltip: 'How much to decrease by in degrees',
+						min: minPhaseOffsetAngleStep,
+						max: maxPhaseOffsetAngleStep,
+						default: defaultPhaseOffsetAngleStep,
+						step: 0.1,
+						required: true,
+						range: false,
+					},
+					{
+						type: 'number',
+						label: 'Decrease Amount (%)',
+						id: 'fraction',
+						tooltip: 'How much to decrease by as a %',
+						min: minPhaseOffsetFractionStep,
+						max: maxPhaseOffsetFractionStep,
+						default: defaultPhaseOffsetFractionStep,
+						step: 0.1,
+						required: true,
+						range: false,
+					},
+					{
+						id: 'wraparound',
+						label: 'Wrap-around?',
+						type: 'checkbox',
+						tooltip: 'If true, positive values will wrap around to 0 when the maximum value is exceeded.',
+						default: false,
+					},
+				],
+				callback: (action, controlId) => {
+					this.phaseOffsetIncreaseOrDecreaseAction(action)
+				},
+			},
+			shutterSyncModeSelect: {
+				name: 'ShutterSync Mode Select (Camera)',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'none',
+						tooltip: 'ShutterSync mode',
+						choices: [
+							{ id: 'none', label: 'None' },
+							{ id: 'angle', label: 'Angle' },
+							{ id: 'speed', label: 'Speed' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.setProcessorProperty(apiKeys.shutterSyncMode, action.options.mode)
+				},
+			},
+			shutterSyncAngleSelect: {
+				name: 'ShutterSync (Angle) Select',
+				options: [
+					{
+						type: 'number',
+						label: 'ShutterSync Angle (' + minShutterSyncAngle + '˚ - ' + maxShutterSyncAngle + '˚)',
+						id: 'angle',
+						tooltip: 'The phase offset angle (' + minShutterSyncAngle + '˚ - ' + maxShutterSyncAngle + '˚)',
+						min: minShutterSyncAngle,
+						max: maxShutterSyncAngle,
+						default: 180.0,
+						step: 1.0,
+						required: true,
+						range: false,
+					},
+				],
+				callback: (action, controlId) => {
+					this.setValidatedPropertyFloat(
+						action.options.angle,
+						minShutterSyncAngle,
+						maxShutterSyncAngle,
+						'ShutterSync',
+						apiKeys.shutterSyncAngle
+					)
+				},
+			},
+			shutterSyncSpeedSelect: {
+				name: 'ShutterSync (Speed) Select',
+				options: [
+					{
+						type: 'number',
+						label: 'ShutterSync Speed (1/' + minShutterSyncSpeed + ' - 1/' + maxShutterSyncSpeed + ')',
+						id: 'speed',
+						tooltip: 'The phase offset speed (1/' + minShutterSyncSpeed + ' - 1/' + maxShutterSyncSpeed + ')',
+						min: minShutterSyncSpeed,
+						max: maxShutterSyncSpeed,
+						default: 120.0,
+						step: 0.001,
+						required: true,
+						range: false,
+					},
+				],
+				callback: (action, controlId) => {
+					this.setValidatedPropertyFloat(
+						action.options.speed,
+						minShutterSyncSpeed,
+						maxShutterSyncSpeed,
+						'ShutterSync',
+						apiKeys.shutterSyncSpeed
+					)
+				},
+			},
+			shutterSyncTimeSelect: {
+				name: 'ShutterSync (Time) Select',
+				options: [
+					{
+						type: 'number',
+						label: 'ShutterSync Time (' + minShutterSyncTime + ' ms - ' + maxShutterSyncTime + ' ms)',
+						id: 'time',
+						tooltip: 'The phase offset time (' + minShutterSyncTime + ' ms - ' + maxShutterSyncTime + ' ms)',
+						min: minShutterSyncTime,
+						max: maxShutterSyncTime,
+						default: 10.0,
+						step: 0.001,
+						required: true,
+						range: false,
+					},
+				],
+				callback: (action, controlId) => {
+					this.setValidatedPropertyFloat(
+						action.options.time,
+						minShutterSyncTime,
+						maxShutterSyncTime,
+						'ShutterSync',
+						apiKeys.shutterSyncTime
+					)
+				},
+			},
+			shutterSyncPrioritiseRefreshRateToggle: {
+				name: 'ShutterSync Prioritise Refresh Rate Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'ShutterSync Prioritise Refresh Rate toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.shutterSyncPrioritiseRefreshRate, 'ShutterSync Prioritise Refresh Rate')
+				},
+			},
+			hiddenMarkersToggle: {
+				name: 'Hidden Markers Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Hidden Markers toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+					{
+						type: 'dropdown',
+						label: 'Marker Type',
+						id: 'type',
+						default: 'starTracker',
+						tooltip: 'Hidden Markers mode selection',
+						choices: [
+							{ id: 'starTracker', label: 'StarTracker' },
+							{ id: 'redSpy', label: 'RedSpy' },
+							{ id: 'custom', label: 'Custom' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					let selectedMarkersMode = action.options.type.toLowerCase()
+
+					if (this.getVariableValue('hiddenMarkersMode') !== '?') {
+						this.setProcessorProperty(apiKeys.hiddenMarkersMode, selectedMarkersMode)
+					}
+
+					this.toggleAction(action, apiKeys.hiddenMarkers, 'Hidden Markers')
+				},
+			},
+			frameRemappingToggle: {
+				name: 'Frame Remapping Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Frame Remapping toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.frameRemapping, 'Frame Remapping')
+				},
+			},
+
 			// Presets
 			presetSelect: {
 				name: 'Preset Select',
@@ -1467,6 +1861,94 @@ class BromptonInstance extends InstanceBase {
 
 	// Network
 	// Camera
+	phaseOffsetIncreaseOrDecreaseAction(action) {
+		let self = this
+
+		let state = self.state
+
+		try {
+			let mode = this.getVariableValue('phaseOffsetMode')
+			let settings = getPhaseOffsetActionSettings(mode)
+			validateActionInput(settings)
+
+			let phaseOffsetValue = getCurrentPhaseOffsetValue(state, settings.apiKey)
+			let newPhaseOffsetValue = applyValueChange(phaseOffsetValue, settings)
+			this.setProcessorProperty(settings.apiKey, newPhaseOffsetValue)
+		} catch (error) {
+			let msg = 'Action ' + action.actionId + ' failed'
+			if (error.message && error.message.length > 0) {
+				msg += ' (' + error.message + ')'
+			}
+			this.log('error', msg)
+		}
+
+		// Helper functions
+		function getPhaseOffsetActionSettings(mode) {
+			var apiKey
+			var actionStep
+			var minStepValue
+			var maxStepValue
+			var maxValue
+			var minValue
+
+			if (mode == 'angle') {
+				apiKey = apiKeys.phaseOffsetAngle
+				actionStep = action.options.angle
+				minStepValue = minPhaseOffsetAngleStep
+				maxStepValue = maxPhaseOffsetAngleStep
+				maxValue = maxPhaseOffsetAngle
+				minValue = minPhaseOffsetAngle
+			} else if (mode == 'fraction') {
+				apiKey = apiKeys.phaseOffsetFraction
+				actionStep = action.options.fraction
+				minStepValue = minPhaseOffsetFractionStep
+				maxStepValue = maxPhaseOffsetFractionStep
+				maxValue = maxPhaseOffsetFraction
+				minValue = minPhaseOffsetFraction
+			} else {
+				throw new Error('Please select a Phase Offset mode option (Angle/Fraction)')
+			}
+			return {
+				apiKey,
+				actionStep,
+				minStepValue,
+				maxStepValue,
+				maxValue,
+				minValue,
+			}
+		}
+
+		function validateActionInput(settings) {
+			let description = getActionDescription(action.actionId)
+			validateFloat(settings.actionStep, settings.minStepValue, settings.maxStepValue, description)
+		}
+
+		function getCurrentPhaseOffsetValue(state, apiKey) {
+			let phaseOffsetValue = getProperty(state, apiKey)
+			if (phaseOffsetValue === undefined) {
+				throw new Error('Phase Offset is not available')
+			}
+
+			return parseFloat(phaseOffsetValue)
+		}
+
+		function applyValueChange(phaseOffsetValue, settings) {
+			if (action.actionId == 'phaseOffsetIncrease') {
+				phaseOffsetValue += settings.actionStep
+			} else {
+				phaseOffsetValue -= settings.actionStep
+			}
+			if (action.options.wraparound === true) {
+				phaseOffsetValue = (phaseOffsetValue + settings.maxValue) % settings.maxValue
+			} else {
+				phaseOffsetValue = clamp(phaseOffsetValue, settings.minValue, settings.maxValue)
+			}
+
+			phaseOffsetValue = phaseOffsetValue.toFixed(6)
+
+			return phaseOffsetValue
+		}
+	}
 
 	// Presets
 	presetNextOrPreviousAction(action) {

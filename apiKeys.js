@@ -31,6 +31,17 @@ const apiKeys = {
 	// Network
 
 	// Camera
+	phaseOffsetMode: ['api', 'output', 'network', 'genlock', 'phase-offset', 'mode'],
+	phaseOffsetAngle: ['api', 'output', 'network', 'genlock', 'phase-offset', 'angle'],
+	phaseOffsetFraction: ['api', 'output', 'network', 'genlock', 'phase-offset', 'fraction'],
+	shutterSyncMode: ['api', 'output', 'network', 'shuttersync', 'mode'],
+	shutterSyncAngle: ['api', 'output', 'network', 'shuttersync', 'angle-settings', 'shutter-angle'],
+	shutterSyncSpeed: ['api', 'output', 'network', 'shuttersync', 'speed-settings', 'shutter-speed'],
+	shutterSyncTime: ['api', 'output', 'network', 'shuttersync', 'speed-settings', 'time'],
+	shutterSyncPrioritiseRefreshRate: ['api', 'output', 'network', 'shuttersync', 'prioritise-refresh-rate'],
+	hiddenMarkers: ['api', 'output', 'network', 'startracker', 'enabled'],
+	hiddenMarkersMode: ['api', 'output', 'network', 'hidden-markers', 'mode'],
+	frameRemapping: ['api', 'output', 'network', 'frame-remapping', 'enabled'],
 
 	// Presets
 	activePresetNumber: ['api', 'presets', 'active', 'number'],
