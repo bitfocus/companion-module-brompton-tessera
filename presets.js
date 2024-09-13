@@ -36,17 +36,6 @@ module.exports = async function (self) {
 						{
 							actionId: 'testPatternTypeSelect',
 							options: {
-								type: 'brompton-overlay',
-							},
-						},
-					],
-					up: [],
-				},
-				{
-					down: [
-						{
-							actionId: 'testPatternTypeSelect',
-							options: {
 								type: 'white',
 							},
 						},
