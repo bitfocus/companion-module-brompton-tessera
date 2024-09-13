@@ -3,6 +3,7 @@
 const { InstanceBase, Regex, runEntrypoint, InstanceStatus } = require('@companion-module/base')
 const request = require('request')
 const UpdatePresets = require('./presets')
+const UpgradeScripts = require('./upgrades.js')
 const { apiKeys } = require('./apiKeys.js')
 
 // Constants
@@ -2132,4 +2133,4 @@ class BromptonInstance extends InstanceBase {
 	}
 }
 
-runEntrypoint(BromptonInstance, [])
+runEntrypoint(BromptonInstance, UpgradeScripts)
