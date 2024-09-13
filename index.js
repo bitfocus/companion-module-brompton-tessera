@@ -7,8 +7,12 @@ const { apiKeys } = require('./apiKeys.js')
 // Constants
 const pollIntervalMs = 1000
 const timeoutMs = 2000
+
 const minPreset = 1
 const maxPreset = 128
+const minFrameStore = 1
+const maxFrameStore = 50
+
 const minBrightness = 0
 const maxBrightness = 10000
 const defaultBrightness = 5000
@@ -583,6 +587,7 @@ class BromptonInstance extends InstanceBase {
 		let self = this
 
 		const presetRange = rangeToString(minPreset, maxPreset)
+		const frameStoreRange = rangeToString(minFrameStore, maxFrameStore)
 		const brightnessRange = rangeToString(minBrightness, maxBrightness, 'nits')
 		const brightnessStepRange = rangeToString(minBrightnessStep, maxBrightnessStep, 'nits')
 		const colourTemperatureRange = rangeToString(minColourTemperature, maxColourTemperature, 'K')
@@ -915,6 +920,59 @@ class BromptonInstance extends InstanceBase {
 					this.setProcessorProperty(apiKeys.testPatternType, action.options.type)
 				},
 			},
+			frameStoreFrameSelect: {
+				name: 'Frame Store Select',
+				options: [
+					{
+						type: 'number',
+						label: 'Frame Store Number',
+						id: 'frameStoreNumber',
+						tooltip: 'The frame to select ' + frameStoreRange,
+						min: minFrameStore,
+						max: maxFrameStore,
+						default: minFrameStore,
+						step: 1,
+						required: true,
+						range: false,
+					},
+				],
+				callback: (action, controlId) => {
+					this.setValidatedProperty(
+						action.options.frameStoreNumber,
+						minFrameStore,
+						maxFrameStore,
+						'Frame Store Number',
+						apiKeys.testPatternType
+					)
+				},
+			},
+			frameStoreFrameCapture: {
+				name: 'Frame Store Capture',
+				options: [
+					{
+						type: 'number',
+						label: 'Frame Store Number',
+						id: 'frameStoreNumber',
+						tooltip: 'The frame to store the capture in ' + frameStoreRange,
+						min: minFrameStore,
+						max: maxFrameStore,
+						default: minFrameStore,
+						step: 1,
+						required: true,
+						range: false,
+					},
+				],
+				callback: (action, controlId) => {
+					this.setValidatedProperty(
+						action.options.frameStoreNumber,
+						minFrameStore,
+						maxFrameStore,
+						'Frame Store Number',
+						apiKeys.frameStoreCapture
+					)
+				},
+			},
+
 			// Colour & Output
 			outputBrightnessSelect: {
 				name: 'Output Brightness Select',

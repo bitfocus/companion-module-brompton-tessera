@@ -15,6 +15,8 @@ const apiKeys = {
 	testPattern: ['api', 'override', 'test-pattern', 'enabled'],
 	testPatternFormat: ['api', 'override', 'test-pattern', 'format'],
 	testPatternType: ['api', 'override', 'test-pattern', 'type'],
+	frameStoreCapture: ['api', 'override', 'test-pattern', 'frame-store', 'capture-frame'],
+
 	// Colour & Output
 	outputBrightness: ['api', 'output', 'global-colour', 'brightness'],
 	overdrive: ['api', 'output', 'global-colour', 'overdrive', 'enabled'],
