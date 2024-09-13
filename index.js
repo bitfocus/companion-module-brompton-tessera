@@ -455,14 +455,29 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
+				callback: (action, bank) => {
+					this.setValidatedProperty(
+						action.options.presetNumber,
+						minPreset,
+						maxPreset,
+						'Preset Number',
+						this.apiKeyActivePresetNumber
+					)
+				},
 			},
 			presetNext: {
 				label: 'Preset Next',
 				options: [],
+				callback: (action, bank) => {
+					this.presetNextOrPreviousAction(action)
+				},
 			},
 			presetPrevious: {
 				label: 'Preset Previous',
 				options: [],
+				callback: (action, bank) => {
+					this.presetNextOrPreviousAction(action)
+				},
 			},
 			outputBrightnessSelect: {
 				label: 'Output Brightness Select',
@@ -480,10 +495,22 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
+				callback: (action, bank) => {
+					this.setValidatedProperty(
+						action.options.brightness,
+						minBrightness,
+						maxBrightness,
+						'Brightness',
+						this.apiKeyOutputBrightness
+					)
+				},
 			},
 			outputBrightnessSetToMax: {
 				label: 'Output Brightness Set To Common Maximum',
 				options: [],
+				callback: (action, bank) => {
+					this.setProcessorProperty(this.apiKeyOutputBrightness, -1)
+				},
 			},
 			outputBrightnessIncrease: {
 				label: 'Output Brightness Increase',
@@ -501,6 +528,9 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
+				callback: (action, bank) => {
+					this.brightnessIncreaseOrDecreaseAction(action)
+				},
 			},
 			outputBrightnessDecrease: {
 				label: 'Output Brightness Decrease',
@@ -518,6 +548,9 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
+				callback: (action, bank) => {
+					this.brightnessIncreaseOrDecreaseAction(action)
+				},
 			},
 			outputTemperatureSelect: {
 				label: 'Output Temperature Select',
@@ -598,6 +631,9 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
+				callback: (action, bank) => {
+					this.groupBrightnessSelectAction(action)
+				},
 			},
 			groupBrightnessIncrease: {
 				label: 'Group Brightness Increase',
@@ -627,6 +663,9 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
+				callback: (action, bank) => {
+					this.groupBrightnessIncreaseOrDecreaseAction(action)
+				},
 			},
 			groupBrightnessDecrease: {
 				label: 'Group Brightness Decrease',
@@ -656,42 +695,72 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
+				callback: (action, bank) => {
+					this.groupBrightnessIncreaseOrDecreaseAction(action)
+				},
 			},
 			blackoutToggle: {
 				label: 'Blackout Toggle',
 				options: [],
+				callback: (action, bank) => {
+					this.blackoutToggleAction(action)
+				},
 			},
 			blackoutEnable: {
 				label: 'Blackout Enable',
 				options: [],
+				callback: (action, bank) => {
+					this.setProcessorProperty(this.apiKeyBlackout, true)
+				},
 			},
 			blackoutDisable: {
 				label: 'Blackout Disable',
 				options: [],
+				callback: (action, bank) => {
+					this.setProcessorProperty(this.apiKeyBlackout, false)
+				},
 			},
 			freezeToggle: {
 				label: 'Freeze Toggle',
 				options: [],
+				callback: (action, bank) => {
+					this.freezeToggle(action)
+				},
 			},
 			freezeEnable: {
 				label: 'Freeze Enable',
 				options: [],
+				callback: (action, bank) => {
+					this.setProcessorProperty(this.apiKeyFreeze, true)
+				},
 			},
 			freezeDisable: {
 				label: 'Freeze Disable',
 				options: [],
+				callback: (action, bank) => {
+					this.setProcessorProperty(this.apiKeyFreeze, false)
+				},
 			},
 			testPatternToggle: {
 				label: 'Test Pattern Toggle',
 				options: [],
+				callback: (action, bank) => {
+					this.testPatternToggleAction(action)
+				},
 			},
 			testPatternEnable: {
 				label: 'Test Pattern Enable',
 				options: [],
+				callback: (action, bank) => {
+					this.setProcessorProperty(this.apiKeyTestPattern, true)
+				},
 			},
 			testPatternDisable: {
 				label: 'Test Pattern Disable',
 				options: [],
+				callback: (action, bank) => {
+					this.setProcessorProperty(this.apiKeyTestPattern, false)
+				},
 			},
 			testPatternFormatSelect: {
 				label: 'Test Pattern Format Select',
@@ -710,6 +779,9 @@ class BromptonInstance extends instance_skel {
 						],
 					},
 				],
+				callback: (action, bank) => {
+					this.setProcessorProperty(this.apiKeyTestPatternFormat, action.options.format)
+				},
 			},
 			testPatternTypeSelect: {
 				label: 'Test Pattern Type Select',
@@ -748,6 +820,9 @@ class BromptonInstance extends instance_skel {
 						],
 					},
 				],
+				callback: (action, bank) => {
+					this.setProcessorProperty(this.apiKeyTestPatternType, action.options.type)
+				},
 			},
 			inputPortNumberSelect: {
 				label: 'Input Port Number Select',
@@ -764,6 +839,9 @@ class BromptonInstance extends instance_skel {
 						],
 					},
 				],
+				callback: (action, bank) => {
+					this.setProcessorProperty(this.apiKeyInputPortNumber, action.options.portNumber)
+				},
 			},
 			inputPortTypeSelect: {
 				label: 'Input Port Type Select',
@@ -781,207 +859,213 @@ class BromptonInstance extends instance_skel {
 						],
 					},
 				],
+				callback: (action, bank) => {
+					this.setProcessorProperty(this.apiKeyInputPortType, action.options.portType)
+				},
 			},
 		})
 	}
 
-	action(action) {
-		let self = this
-
+	setValidatedProperty(value, min, max, label, apiKey) {
 		try {
-			if (action.action == 'presetSelect') {
-				validate(action.options.presetNumber, minPreset, maxPreset, 'Preset Number')
-				self.setProcessorProperty(self.apiKeyActivePresetNumber, action.options.presetNumber)
+			validate(value, min, max, label)
+			this.setProcessorProperty(apiKey, value)
+		} catch (error) {
+			let msg = 'Action ' + label + ' failed'
+			if (error.message && error.message.length > 0) {
+				msg += ' (' + error.message + ')'
+			}
+			this.log('error', msg)
+		}
+	}
+
+	presetNextOrPreviousAction(action) {
+		try {
+			let preset = getProperty(this.state, this.apiKeyActivePresetNumber)
+
+			if (preset === undefined) {
+				throw new Error('Active Preset Number is not available')
 			}
 
-			if (action.action == 'presetNext' || action.action == 'presetPrevious') {
-				let preset = getProperty(self.state, self.apiKeyActivePresetNumber)
+			preset = parseInt(preset)
 
-				if (preset === undefined) {
-					throw new Error('Active Preset Number is not available')
-				}
-
-				preset = parseInt(preset)
-
-				// Create a list of presets.
-				const items = getProperty(self.state, ['api', 'presets', 'items'])
-				if (items === undefined) {
-					return // Nothing to do.
-				}
-
-				let listOfPresets = Object.keys(items).map((x) => parseInt(x))
-				if (listOfPresets.length === 0) {
-					return // Nothing to do.
-				}
-
-				// Find the next/previous preset.
-				let index
-
-				if (action.action == 'presetNext') {
-					listOfPresets.sort((x, y) => x - y)
-					index = listOfPresets.findIndex((x) => preset < x)
-				} else {
-					listOfPresets.sort((x, y) => y - x)
-					index = listOfPresets.findIndex((x) => x < preset)
-				}
-
-				if (index === -1) {
-					index = 0 // Wrap around.
-				}
-
-				self.setProcessorProperty(self.apiKeyActivePresetNumber, listOfPresets[index])
+			// Create a list of presets.
+			const items = getProperty(this.state, ['api', 'presets', 'items'])
+			if (items === undefined) {
+				return // Nothing to do.
 			}
 
-			if (action.action == 'outputBrightnessSelect') {
-				validate(action.options.brightness, minBrightness, maxBrightness, 'Brightness')
-				self.setProcessorProperty(self.apiKeyOutputBrightness, action.options.brightness)
+			let listOfPresets = Object.keys(items).map((x) => parseInt(x))
+			if (listOfPresets.length === 0) {
+				return // Nothing to do.
 			}
 
-			if (action.action == 'outputBrightnessSetToMax') {
-				self.setProcessorProperty(self.apiKeyOutputBrightness, -1)
+			// Find the next/previous preset.
+			let index
+
+			if (action.action == 'presetNext') {
+				listOfPresets.sort((x, y) => x - y)
+				index = listOfPresets.findIndex((x) => preset < x)
+			} else {
+				listOfPresets.sort((x, y) => y - x)
+				index = listOfPresets.findIndex((x) => x < preset)
 			}
 
-			if (action.action == 'outputBrightnessIncrease' || action.action == 'outputBrightnessDecrease') {
-				let description
-				if (action.action == 'outputBrightnessIncrease') {
-					description = 'Increase Amount'
-				} else {
-					description = 'Decrease Amount'
-				}
-
-				validate(action.options.step, minBrightnessStep, maxBrightnessStep, description)
-
-				let brightness = getProperty(self.state, self.apiKeyOutputBrightness)
-
-				if (brightness === undefined) {
-					throw new Error('Output Brightness is not available')
-				}
-
-				brightness = parseInt(brightness)
-
-				if (action.action == 'outputBrightnessIncrease') {
-					brightness += action.options.step
-				} else {
-					brightness -= action.options.step
-				}
-
-				brightness = clamp(brightness, minBrightness, maxBrightness)
-
-				self.setProcessorProperty(self.apiKeyOutputBrightness, brightness)
+			if (index === -1) {
+				index = 0 // Wrap around.
 			}
 
-			if (action.action == 'groupBrightnessSelect') {
-				validate(action.options.group, minGroupNumber, maxGroupNumber, 'Group Number')
-				validate(action.options.brightness, minBrightness, maxBrightness, 'Brightness')
-				self.setProcessorProperty(apiKeyGroupBrightness(action.options.group), action.options.brightness)
-			}
-
-			if (action.action == 'groupBrightnessIncrease' || action.action == 'groupBrightnessDecrease') {
-				validate(action.options.group, minGroupNumber, maxGroupNumber, 'Group Number')
-
-				let description
-				if (action.action == 'groupBrightnessIncrease') {
-					description = 'Increase Amount'
-				} else {
-					description = 'Decrease Amount'
-				}
-
-				validate(action.options.step, minBrightnessStep, maxBrightnessStep, description)
-
-				let brightness = getProperty(self.state, apiKeyGroupBrightness(action.options.group))
-
-				if (brightness === undefined) {
-					throw new Error('Group ' + action.options.group + ' Brightness is not available')
-				}
-
-				brightness = parseInt(brightness)
-
-				if (action.action == 'groupBrightnessIncrease') {
-					brightness += action.options.step
-				} else {
-					brightness -= action.options.step
-				}
-
-				brightness = clamp(brightness, minBrightness, maxBrightness)
-
-				self.setProcessorProperty(apiKeyGroupBrightness(action.options.group), brightness)
-			}
-
-			if (action.action == 'blackoutToggle') {
-				let enabled = getProperty(self.state, self.apiKeyBlackout)
-
-				if (enabled === undefined) {
-					throw new Error('Blackout state is not available')
-				}
-
-				self.setProcessorProperty(self.apiKeyBlackout, !enabled)
-			}
-
-			if (action.action == 'blackoutEnable') {
-				self.setProcessorProperty(self.apiKeyBlackout, true)
-			}
-
-			if (action.action == 'blackoutDisable') {
-				self.setProcessorProperty(self.apiKeyBlackout, false)
-			}
-
-			if (action.action == 'freezeToggle') {
-				let enabled = getProperty(self.state, self.apiKeyFreeze)
-
-				if (enabled === undefined) {
-					throw new Error('Freeze state is not available')
-				}
-
-				self.setProcessorProperty(self.apiKeyFreeze, !enabled)
-			}
-
-			if (action.action == 'freezeEnable') {
-				self.setProcessorProperty(self.apiKeyFreeze, true)
-			}
-
-			if (action.action == 'freezeDisable') {
-				self.setProcessorProperty(self.apiKeyFreeze, false)
-			}
-
-			if (action.action == 'testPatternToggle') {
-				let enabled = getProperty(self.state, self.apiKeyTestPattern)
-
-				if (enabled === undefined) {
-					throw new Error('Test Pattern state is not available')
-				}
-
-				self.setProcessorProperty(self.apiKeyTestPattern, !enabled)
-			}
-
-			if (action.action == 'testPatternEnable') {
-				self.setProcessorProperty(self.apiKeyTestPattern, true)
-			}
-
-			if (action.action == 'testPatternDisable') {
-				self.setProcessorProperty(self.apiKeyTestPattern, false)
-			}
-
-			if (action.action == 'testPatternFormatSelect') {
-				self.setProcessorProperty(self.apiKeyTestPatternFormat, action.options.format)
-			}
-
-			if (action.action == 'testPatternTypeSelect') {
-				self.setProcessorProperty(self.apiKeyTestPatternType, action.options.type)
-			}
-
-			if (action.action == 'inputPortNumberSelect') {
-				self.setProcessorProperty(self.apiKeyInputPortNumber, action.options.portNumber)
-			}
-
-			if (action.action == 'inputPortTypeSelect') {
-				self.setProcessorProperty(self.apiKeyInputPortType, action.options.portType)
-			}
+			this.setProcessorProperty(this.apiKeyActivePresetNumber, listOfPresets[index])
 		} catch (error) {
 			let msg = 'Action ' + action.action + ' failed'
 			if (error.message && error.message.length > 0) {
 				msg += ' (' + error.message + ')'
 			}
-			self.log('error', msg)
+			this.log('error', msg)
+		}
+	}
+
+	outputBrightnessIncreaseDecreaseAction(action) {
+		try {
+			let description
+			if (action.action == 'outputBrightnessIncrease') {
+				description = 'Increase Amount'
+			} else {
+				description = 'Decrease Amount'
+			}
+
+			validate(action.options.step, minBrightnessStep, maxBrightnessStep, description)
+
+			let brightness = getProperty(this.state, this.apiKeyOutputBrightness)
+
+			if (brightness === undefined) {
+				throw new Error('Output Brightness is not available')
+			}
+
+			brightness = parseInt(brightness)
+
+			if (action.action == 'outputBrightnessIncrease') {
+				brightness += action.options.step
+			} else {
+				brightness -= action.options.step
+			}
+
+			brightness = clamp(brightness, minBrightness, maxBrightness)
+
+			this.setProcessorProperty(this.apiKeyOutputBrightness, brightness)
+		} catch (error) {
+			let msg = 'Action ' + action.action + ' failed'
+			if (error.message && error.message.length > 0) {
+				msg += ' (' + error.message + ')'
+			}
+			this.log('error', msg)
+		}
+	}
+
+	groupBrightnessSelectAction(action) {
+		try {
+			validate(action.options.group, minGroupNumber, maxGroupNumber, 'Group Number')
+			validate(action.options.brightness, minBrightness, maxBrightness, 'Brightness')
+			this.setProcessorProperty(apiKeyGroupBrightness(action.options.group), action.options.brightness)
+		} catch (error) {
+			let msg = 'Action ' + action.action + ' failed'
+			if (error.message && error.message.length > 0) {
+				msg += ' (' + error.message + ')'
+			}
+			this.log('error', msg)
+		}
+	}
+
+	groupBrightnessIncreaseOrDecreaseAction(action) {
+		try {
+			validate(action.options.group, minGroupNumber, maxGroupNumber, 'Group Number')
+
+			let description
+			if (action.action == 'groupBrightnessIncrease') {
+				description = 'Increase Amount'
+			} else {
+				description = 'Decrease Amount'
+			}
+
+			validate(action.options.step, minBrightnessStep, maxBrightnessStep, description)
+
+			let brightness = getProperty(this.state, apiKeyGroupBrightness(action.options.group))
+
+			if (brightness === undefined) {
+				throw new Error('Group ' + action.options.group + ' Brightness is not available')
+			}
+
+			brightness = parseInt(brightness)
+
+			if (action.action == 'groupBrightnessIncrease') {
+				brightness += action.options.step
+			} else {
+				brightness -= action.options.step
+			}
+
+			brightness = clamp(brightness, minBrightness, maxBrightness)
+
+			this.setProcessorProperty(apiKeyGroupBrightness(action.options.group), brightness)
+		} catch (error) {
+			let msg = 'Action ' + action.action + ' failed'
+			if (error.message && error.message.length > 0) {
+				msg += ' (' + error.message + ')'
+			}
+			this.log('error', msg)
+		}
+	}
+
+	blackoutToggleAction(action) {
+		try {
+			let enabled = getProperty(this.state, this.apiKeyBlackout)
+
+			if (enabled === undefined) {
+				throw new Error('Blackout state is not available')
+			}
+
+			this.setProcessorProperty(this.apiKeyBlackout, !enabled)
+		} catch (error) {
+			let msg = 'Action ' + action.action + ' failed'
+			if (error.message && error.message.length > 0) {
+				msg += ' (' + error.message + ')'
+			}
+			this.log('error', msg)
+		}
+	}
+
+	freezeToggleAction(action) {
+		try {
+			let enabled = getProperty(this.state, this.apiKeyFreeze)
+
+			if (enabled === undefined) {
+				throw new Error('Freeze state is not available')
+			}
+
+			this.setProcessorProperty(this.apiKeyFreeze, !enabled)
+		} catch (error) {
+			let msg = 'Action ' + action.action + ' failed'
+			if (error.message && error.message.length > 0) {
+				msg += ' (' + error.message + ')'
+			}
+			this.log('error', msg)
+		}
+	}
+
+	testPatternToggleAction() {
+		try {
+			let enabled = getProperty(this.state, this.apiKeyTestPattern)
+
+			if (enabled === undefined) {
+				throw new Error('Test Pattern state is not available')
+			}
+
+			this.setProcessorProperty(this.apiKeyTestPattern, !enabled)
+		} catch (error) {
+			let msg = 'Action ' + action.action + ' failed'
+			if (error.message && error.message.length > 0) {
+				msg += ' (' + error.message + ')'
+			}
+			this.log('error', msg)
 		}
 	}
 }
