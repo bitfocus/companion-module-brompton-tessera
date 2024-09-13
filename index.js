@@ -328,6 +328,51 @@ class BromptonInstance extends InstanceBase {
 				apiKey: apiKeys.outputBrightness,
 			},
 			{
+				definition: { name: 'Overdrive', variableId: 'overdrive' },
+				apiKey: apiKeys.overdrive,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Highlight Out-Of-Gamut Pixels', variableId: 'highlightOutOfGamut' },
+				apiKey: apiKeys.highlightOutOfGamut,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Highlight Out-Of-Gamut Pixels (v3.4)', variableId: 'highlightOutOfGamut3.4' },
+				apiKey: apiKeys.highlightOutOfGamut3_4,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Highlight Overbright Pixels', variableId: 'highlightOverbright' },
+				apiKey: apiKeys.highlightOverbright,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'OSCA Module Correction', variableId: 'oscaModuleCorrection' },
+				apiKey: apiKeys.oscaModule,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'OSCA Seam Correction', variableId: 'oscaSeamCorrection' },
+				apiKey: apiKeys.oscaSeam,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Dark Magic', variableId: 'darkMagic' },
+				apiKey: apiKeys.darkMagic,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Extended Bit Depth', variableId: 'extendedBitDepth' },
+				apiKey: apiKeys.extendedBitDepth,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'PureTone', variableId: 'pureTone' },
+				apiKey: apiKeys.pureTone,
+				transform: convertBool,
+			},
+			{
 				definition: { name: 'Output Colour Temperature', variableId: 'outputColourTemperature' },
 				apiKey: apiKeys.outputColourTemperature,
 			},
@@ -875,6 +920,186 @@ class BromptonInstance extends InstanceBase {
 				],
 				callback: (action, controlId) => {
 					this.outputBrightnessIncreaseOrDecreaseAction(action)
+				},
+			},
+			overdriveToggle: {
+				name: 'Overdrive Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Overdrive toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.overdrive, 'Overdrive')
+				},
+			},
+			highlightOutOfGamutToggle: {
+				name: 'Highlight Out-Of-Gamut Pixels Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Highlight Out-Of-Gamut Pixels toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.highlightOutOfGamut, 'Highlight Out-Of-Gamut Pixels')
+				},
+			},
+			highlightOutOfGamutToggle3_4: {
+				name: 'Highlight Out-Of-Gamut Pixels Toggle/Enable/Disable (v3.4)',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Highlight Out-Of-Gamut Pixels toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.highlightOutOfGamut3_4, 'Highlight Out-Of-Gamut Pixels (3.4 and older)')
+				},
+			},
+			highlightOverbrightToggle: {
+				name: 'Highlight Overbright Pixels Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Highlight Overbright Pixels toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.highlightOverbright, 'Highlight Overbright Pixels')
+				},
+			},
+			oscaModuleToggle: {
+				name: 'OSCA Module Correction Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'OSCA Module Correction toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.oscaModule, 'OSCA Module Correction')
+				},
+			},
+			oscaSeamToggle: {
+				name: 'OSCA Seam Correction Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'OSCA Seam Correction toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.oscaSeam, 'OSCA Seam Correction')
+				},
+			},
+			darkMagicToggle: {
+				name: 'Dark Magic Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Dark Magic toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.darkMagic, 'Dark Magic')
+				},
+			},
+			extendedBitDepthToggle: {
+				name: 'Extended Bit Depth Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Extended Bit Depth toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.extendedBitDepth, 'Extended Bit Depth')
+				},
+			},
+			pureToneToggle: {
+				name: 'PureTone Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'PureTone toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.pureTone, 'PureTone')
 				},
 			},
 			outputColourTemperatureSelect: {

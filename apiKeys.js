@@ -17,6 +17,15 @@ const apiKeys = {
 	testPatternType: ['api', 'override', 'test-pattern', 'type'],
 	// Colour & Output
 	outputBrightness: ['api', 'output', 'global-colour', 'brightness'],
+	overdrive: ['api', 'output', 'global-colour', 'overdrive', 'enabled'],
+	highlightOutOfGamut: ['api', 'output', 'global-colour', 'dynacal', 'highlight-out-of-gamut-pixels-enabled'],
+	highlightOutOfGamut3_4: ['api', 'output', 'global-colour', 'dynacal', 'hightlight-out-of-gamut-pixels-enabled'],
+	highlightOverbright: ['api', 'output', 'global-colour', 'dynacal', 'highlight-overbright-pixels-enabled'],
+	oscaModule: ['api', 'processing', 'osca', 'module-correction-enabled'],
+	oscaSeam: ['api', 'processing', 'osca', 'seam-correction-enabled'],
+	darkMagic: ['api', 'output', 'global-colour', 'dark-magic', 'enabled'],
+	extendedBitDepth: ['api', 'output', 'global-colour', 'extended-bit-depth', 'enabled'],
+	pureTone: ['api', 'output', 'global-colour', 'puretone', 'enabled'],
 	outputColourTemperature: ['api', 'output', 'global-colour', 'colour-temperature'],
 
 	// Network
