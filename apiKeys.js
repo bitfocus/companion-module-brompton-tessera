@@ -48,6 +48,8 @@ const apiKeys = {
 	activePresetName: ['api', 'presets', 'active', 'name'],
 
 	// System
+	shutDown: ['api', 'system', 'actions', 'shutdown'],
+	reboot: ['api', 'system', 'actions', 'reboot'],
 }
 
 module.exports = { apiKeys }

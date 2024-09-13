@@ -1706,6 +1706,20 @@ class BromptonInstance extends InstanceBase {
 			},
 
 			// System
+			shutDown: {
+				name: 'Shut Down',
+				options: [],
+				callback: (action, controlId) => {
+					this.setProcessorProperty(apiKeys.shutDown, '')
+				},
+			},
+			reboot: {
+				name: 'Reboot',
+				options: [],
+				callback: (action, controlId) => {
+					this.setProcessorProperty(apiKeys.reboot, '')
+				},
+			},
 		})
 	}
 
