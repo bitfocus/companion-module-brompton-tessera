@@ -64,8 +64,13 @@ function clamp(number, min, max) {
 	return Math.max(min, Math.min(number, max))
 }
 
-function rangeToString(min, max) {
-	return '(' + min + '-' + max + ' inclusive)'
+function rangeToString(min, max, units) {
+	if (units == undefined) {
+		return '(' + min + '-' + max + ')'
+	} else {
+		return '(' + min + '-' + max + ' ' + units + ')'
+	}
+}
 }
 
 class BromptonInstance extends InstanceBase {
@@ -436,8 +441,8 @@ class BromptonInstance extends InstanceBase {
 		let self = this
 
 		const presetRange = rangeToString(minPreset, maxPreset)
-		const brightnessRange = rangeToString(minBrightness, maxBrightness)
-		const brightnessStepRange = rangeToString(minBrightnessStep, maxBrightnessStep)
+		const brightnessRange = rangeToString(minBrightness, maxBrightness, 'nits')
+		const brightnessStepRange = rangeToString(minBrightnessStep, maxBrightnessStep, 'nits')
 
 		self.setActionDefinitions({
 			presetSelect: {
