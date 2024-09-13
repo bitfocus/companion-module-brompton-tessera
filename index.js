@@ -906,6 +906,7 @@ class BromptonInstance extends InstanceBase {
 							{ id: 'checkerboard', label: 'Checkerboard' },
 							{ id: 'scrolling-checkerboard', label: 'Scrolling Checkerboard' },
 							{ id: 'colour-bars', label: 'Colour Bars' },
+							{ id: 'scrolling-colour-bars', label: 'Scrolling Colour Bars'},
 							{ id: 'gradient', label: 'Gradient' },
 							{ id: 'scrolling-gradient', label: 'Scrolling Gradient' },
 							{ id: 'strobe', label: 'Strobe' },

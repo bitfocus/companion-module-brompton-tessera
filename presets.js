@@ -234,6 +234,17 @@ module.exports = async function (self) {
 						{
 							actionId: 'testPatternTypeSelect',
 							options: {
+								type: 'scrolling-colour-bars',
+							},
+						},
+					],
+					up: [],
+				},
+				{
+					down: [
+						{
+							actionId: 'testPatternTypeSelect',
+							options: {
 								type: 'strobe',
 							},
 						},
