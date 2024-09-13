@@ -2,6 +2,7 @@
 
 const { InstanceBase, Regex, runEntrypoint, InstanceStatus } = require('@companion-module/base')
 const request = require('request')
+const { apiKeys } = require('./apiKeys.js')
 
 // Constants
 const pollIntervalMs = 1000
@@ -60,6 +61,16 @@ function validate(number, min, max, description) {
 	}
 }
 
+function validateFloat(number, min, max, description) {
+	if (number === undefined || number === '') {
+		throw new Error(description + ' was not set')
+	}
+
+	if (number < min || max < number) {
+		throw new Error(description + ' is outside of the range (' + min + ', ' + max + ') inclusive')
+	}
+}
+
 function clamp(number, min, max) {
 	return Math.max(min, Math.min(number, max))
 }
@@ -71,6 +82,15 @@ function rangeToString(min, max, units) {
 		return '(' + min + '-' + max + ' ' + units + ')'
 	}
 }
+
+function getActionDescription(actionId) {
+	let description = ''
+	if (actionId.indexOf('Increase') >= 0) {
+		description = 'Increase Amount'
+	} else if (actionId.indexOf('Decrease') >= 0) {
+		description = 'Decrease Amount'
+	}
+	return description
 }
 
 class BromptonInstance extends InstanceBase {
@@ -234,84 +254,64 @@ class BromptonInstance extends InstanceBase {
 
 		const convertBool = (input) => (input ? 'Enabled' : 'Disabled')
 
-		self.apiKeyActivePresetNumber = ['api', 'presets', 'active', 'number']
-		self.apiKeyActivePresetName = ['api', 'presets', 'active', 'name']
-		self.apiKeyOutputBrightness = ['api', 'output', 'global-colour', 'brightness']
-		self.apikeyOutputTemperature = ['api', 'output', 'global-colour', 'colour-temperature']
-		self.apikeyDarkMagic = ['api', 'output', 'global-colour', 'dark-magic']
-		self.apikeyExtendedBitDepth = ['api', 'output', 'global-colour', 'extended-bit-depth']
-		self.apikeyPureTone = ['api', 'output', 'global-colour', 'puretone']
-		self.apiKeyBlackout = ['api', 'override', 'blackout', 'enabled']
-		self.apiKeyFreeze = ['api', 'override', 'freeze', 'enabled']
-		self.apiKeyTestPattern = ['api', 'override', 'test-pattern', 'enabled']
-		self.apiKeyTestPatternFormat = ['api', 'override', 'test-pattern', 'format']
-		self.apiKeyTestPatternType = ['api', 'override', 'test-pattern', 'type']
-		self.apiKeyInputPortNumber = ['api', 'input', 'active', 'source', 'port-number']
-		self.apiKeyInputPortType = ['api', 'input', 'active', 'source', 'port-type']
-
 		self.variableInfo = [
+			// Input
 			{
-				definition: { name: 'Active Preset Number', variableId: 'activePresetNumber' },
-				apiKey: self.apiKeyActivePresetNumber,
+				definition: { name: 'Input Port Number', variableId: 'inputPortNumber' },
+				apiKey: apiKeys.inputPortNumber,
 			},
 			{
-				definition: { name: 'Active Preset Name', variableId: 'activePresetName' },
-				apiKey: self.apiKeyActivePresetName,
+				definition: { name: 'Input Port Type', variableId: 'inputPortType' },
+				apiKey: apiKeys.inputPortType,
 			},
+			// Processing
+			// Override
+			{
+				definition: { name: 'Blackout', variableId: 'blackout' },
+				apiKey: apiKeys.blackout,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Freeze', variableId: 'freeze' },
+				apiKey: apiKeys.freeze,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Test Pattern', variableId: 'testPattern' },
+				apiKey: apiKeys.testPattern,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Test Pattern Format', variableId: 'testPatternFormat' },
+				apiKey: apiKeys.testPatternFormat,
+			},
+			{
+				definition: { name: 'Test Pattern Type', variableId: 'testPatternType' },
+				apiKey: apiKeys.testPatternType,
+			},
+			// Colour & Output
 			{
 				definition: { name: 'Output Brightness', variableId: 'outputBrightness' },
-				apiKey: self.apiKeyOutputBrightness,
+				apiKey: apiKeys.outputBrightness,
+			},
+			{
+				definition: { name: 'Output Brightness %', variableId: 'outputBrightnessPercentage' },
+				apiKey: apiKeys.outputBrightness,
 			},
 			{
 				definition: { label: 'Output Temperature', name: 'outputTemperature' },
 				apiKey: self.apiKeyOutputTemperature,
 			},
+			// Network
+			// Camera
+			// Presets
 			{
-				definition: { label: 'Dark Magic', name: 'darkMagic' },
-				apiKey: self.apiKeyDarkMagic,
+				definition: { name: 'Active Preset Number', variableId: 'activePresetNumber' },
+				apiKey: apiKeys.activePresetNumber,
 			},
 			{
-				definition: { label: 'Extended Bit Depth', name: 'extendedBitDepth' },
-				apiKey: self.apiKeyExtendedBitDepth,
-			},
-			{
-				definition: { label: 'PureTone', name: 'pureTone' },
-				apiKey: self.apiKeyPureTone,
-			},
-			{
-				definition: { label: 'Output Brightness %', name: 'outputBrightnessPercentage' },
-				apiKey: self.apiKeyOutputBrightness,
-			},
-			{
-				definition: { name: 'Blackout', variableId: 'blackout' },
-				apiKey: self.apiKeyBlackout,
-				transform: convertBool,
-			},
-			{
-				definition: { name: 'Freeze', variableId: 'freeze' },
-				apiKey: self.apiKeyFreeze,
-				transform: convertBool,
-			},
-			{
-				definition: { name: 'Test Pattern', variableId: 'testPattern' },
-				apiKey: self.apiKeyTestPattern,
-				transform: convertBool,
-			},
-			{
-				definition: { name: 'Test Pattern Format', variableId: 'testPatternFormat' },
-				apiKey: self.apiKeyTestPatternFormat,
-			},
-			{
-				definition: { name: 'Test Pattern Type', variableId: 'testPatternType' },
-				apiKey: self.apiKeyTestPatternType,
-			},
-			{
-				definition: { name: 'Input Port Number', variableId: 'inputPortNumber' },
-				apiKey: self.apiKeyInputPortNumber,
-			},
-			{
-				definition: { name: 'Input Port Type', variableId: 'inputPortType' },
-				apiKey: self.apiKeyInputPortType,
+				definition: { name: 'Active Preset Name', variableId: 'activePresetName' },
+				apiKey: apiKeys.activePresetName,
 			},
 
 			// Group Brightness variables are added by self.updateGroupDefinitions().
@@ -360,6 +360,7 @@ class BromptonInstance extends InstanceBase {
 		// Add new groups.
 		self.groups = newGroups
 
+		// Add new group variables
 		for (let group of self.groups) {
 			self.variableInfo.push({
 				definition: { name: 'Group ' + group + ' Brightness', variableId: 'groupBrightness' + group },
@@ -390,7 +391,7 @@ class BromptonInstance extends InstanceBase {
 
 			//THIS ADDS SUPPORT FOR OUTPUT BRIGHTNESS PERCENTAGE BY TAKING OUTPUT BRIGHTNESS DIVIDED BY MAX BRIGHTNESS
 			if (info.definition.variableId === 'outputBrightnessPercentage') {
-				result = getProperty(state, self.apiKeyOutputBrightness)
+				result = getProperty(state, apiKeys.outputBrightness)
 				if (result === undefined) {
 					result = '?'
 				} else {
@@ -445,46 +446,172 @@ class BromptonInstance extends InstanceBase {
 		const brightnessStepRange = rangeToString(minBrightnessStep, maxBrightnessStep, 'nits')
 
 		self.setActionDefinitions({
-			presetSelect: {
-				name: 'Preset Select',
+			// Input
+			inputPortNumberSelect: {
+				name: 'Input Port Number Select',
 				options: [
 					{
-						type: 'number',
-						label: 'Preset Number',
-						id: 'presetNumber',
-						tooltip: 'The preset to activate ' + presetRange,
-						min: minPreset,
-						max: maxPreset,
-						default: minPreset,
-						step: 1,
-						required: true,
-						range: false,
+						type: 'dropdown',
+						label: 'Port Number',
+						id: 'portNumber',
+						default: '1',
+						tooltip: 'Input port number',
+						choices: [
+							{ id: '1', label: '1' },
+							{ id: '2', label: '2' },
+						],
 					},
 				],
 				callback: (action, controlId) => {
-					this.setValidatedProperty(
-						action.options.presetNumber,
-						minPreset,
-						maxPreset,
-						'Preset Number',
-						this.apiKeyActivePresetNumber
-					)
+					this.setProcessorProperty(apiKeys.inputPortNumber, action.options.portNumber)
 				},
 			},
-			presetNext: {
-				name: 'Preset Next',
-				options: [],
+			inputPortTypeSelect: {
+				name: 'Input Port Type Select',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Port Type',
+						id: 'portType',
+						default: 'dvi',
+						tooltip: 'Input port type',
+						choices: [
+							{ id: 'dvi', label: 'DVI' },
+							{ id: 'hdmi', label: 'HDMI' },
+							{ id: 'sdi', label: 'SDI' },
+						],
+					},
+				],
 				callback: (action, controlId) => {
-					this.presetNextOrPreviousAction(action)
+					this.setProcessorProperty(apiKeys.inputPortType, action.options.portType)
 				},
 			},
-			presetPrevious: {
-				name: 'Preset Previous',
-				options: [],
+
+			// Processing
+			// Override
+			blackoutToggle: {
+				name: 'Blackout Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Blackout toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
 				callback: (action, controlId) => {
-					this.presetNextOrPreviousAction(action)
+					this.toggleAction(action, apiKeys.blackout, 'Blackout')
 				},
 			},
+			freezeToggle: {
+				name: 'Freeze Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Freeze toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.freeze, 'Freeze')
+				},
+			},
+			testPatternToggle: {
+				name: 'Test Pattern Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Test Pattern toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.testPattern, 'Test Pattern')
+				},
+			},
+			testPatternFormatSelect: {
+				name: 'Test Pattern Format Select',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Format',
+						id: 'format',
+						default: 'from-input',
+						tooltip: 'Test pattern format',
+						choices: [
+							{ id: 'from-input', label: 'From Input' },
+							{ id: 'standard-dynamic-range', label: 'Standard Dynamic Range' },
+							{ id: 'perceptual-quantiser', label: 'Perceptual Quantiser' },
+							{ id: 'hybrid-log-gamma', label: 'Hybrid Log Gamma' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.setProcessorProperty(apiKeys.testPatternFormat, action.options.format)
+				},
+			},
+			testPatternTypeSelect: {
+				name: 'Test Pattern Type Select',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Type',
+						id: 'type',
+						default: 'brompton',
+						tooltip: 'Test pattern type',
+						choices: [
+							{ id: 'brompton', label: 'Brompton' },
+							{ id: 'brompton-overlay', label: 'Brompton Overlay' },
+							{ id: 'red', label: 'Red' },
+							{ id: 'green', label: 'Green' },
+							{ id: 'blue', label: 'Blue' },
+							{ id: 'cyan', label: 'Cyan' },
+							{ id: 'magenta', label: 'Magenta' },
+							{ id: 'yellow', label: 'Yellow' },
+							{ id: 'white', label: 'White' },
+							{ id: 'black', label: 'Black' },
+							{ id: 'grid', label: 'Grid' },
+							{ id: 'scrolling-grid', label: 'Scrolling Grid' },
+							{ id: 'checkerboard', label: 'Checkerboard' },
+							{ id: 'scrolling-checkerboard', label: 'Scrolling Checkerboard' },
+							{ id: 'colour-bars', label: 'Colour Bars' },
+							{ id: 'gamma', label: 'Gamma' },
+							{ id: 'gradient', label: 'Gradient' },
+							{ id: 'scrolling-gradient', label: 'Scrolling Gradient' },
+							{ id: 'strobe', label: 'Strobe' },
+							{ id: 'smpte-bars', label: 'SMPTE Bars' },
+							{ id: 'scrolling-smpte-bars', label: 'Scrolling SMPTE Bars' },
+							{ id: 'custom', label: 'custom' },
+							{ id: 'forty-five-degree-grid', label: '45 Degree Grid' },
+							{ id: 'scrolling-forty-five-degree-grid', label: 'Scrolling 45 Degree Grid' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.setProcessorProperty(apiKeys.testPatternType, action.options.type)
+				},
+			},
+			// Colour & Output
 			outputBrightnessSelect: {
 				name: 'Output Brightness Select',
 				options: [
@@ -507,7 +634,7 @@ class BromptonInstance extends InstanceBase {
 						minBrightness,
 						maxBrightness,
 						'Brightness',
-						this.apiKeyOutputBrightness
+						apiKeys.outputBrightness
 					)
 				},
 			},
@@ -515,7 +642,7 @@ class BromptonInstance extends InstanceBase {
 				name: 'Output Brightness Set To Common Maximum',
 				options: [],
 				callback: (action, controlId) => {
-					this.setProcessorProperty(this.apiKeyOutputBrightness, -1)
+					this.setProcessorProperty(apiKeys.outputBrightness, -1)
 				},
 			},
 			outputBrightnessIncrease: {
@@ -609,6 +736,52 @@ class BromptonInstance extends InstanceBase {
 					},
 				],
 			},
+
+			// Network
+			// Camera
+			// Presets
+			presetSelect: {
+				name: 'Preset Select',
+				options: [
+					{
+						type: 'number',
+						label: 'Preset Number',
+						id: 'presetNumber',
+						tooltip: 'The preset to activate ' + presetRange,
+						min: minPreset,
+						max: maxPreset,
+						default: minPreset,
+						step: 1,
+						required: true,
+						range: false,
+					},
+				],
+				callback: (action, controlId) => {
+					this.setValidatedProperty(
+						action.options.presetNumber,
+						minPreset,
+						maxPreset,
+						'Preset Number',
+						apiKeys.activePresetNumber
+					)
+				},
+			},
+			presetNext: {
+				name: 'Preset Next',
+				options: [],
+				callback: (action, controlId) => {
+					this.presetNextOrPreviousAction(action)
+				},
+			},
+			presetPrevious: {
+				name: 'Preset Previous',
+				options: [],
+				callback: (action, controlId) => {
+					this.presetNextOrPreviousAction(action)
+				},
+			},
+
+			// Groups
 			groupBrightnessSelect: {
 				name: 'Group Brightness Select',
 				options: [
@@ -705,170 +878,8 @@ class BromptonInstance extends InstanceBase {
 					this.groupBrightnessIncreaseOrDecreaseAction(action)
 				},
 			},
-			blackoutToggle: {
-				name: 'Blackout Toggle',
-				options: [],
-				callback: (action, controlId) => {
-					this.blackoutToggleAction(action)
-				},
-			},
-			blackoutEnable: {
-				name: 'Blackout Enable',
-				options: [],
-				callback: (action, controlId) => {
-					this.setProcessorProperty(this.apiKeyBlackout, true)
-				},
-			},
-			blackoutDisable: {
-				name: 'Blackout Disable',
-				options: [],
-				callback: (action, controlId) => {
-					this.setProcessorProperty(this.apiKeyBlackout, false)
-				},
-			},
-			freezeToggle: {
-				name: 'Freeze Toggle',
-				options: [],
-				callback: (action, controlId) => {
-					this.freezeToggleAction(action)
-				},
-			},
-			freezeEnable: {
-				name: 'Freeze Enable',
-				options: [],
-				callback: (action, controlId) => {
-					this.setProcessorProperty(this.apiKeyFreeze, true)
-				},
-			},
-			freezeDisable: {
-				name: 'Freeze Disable',
-				options: [],
-				callback: (action, controlId) => {
-					this.setProcessorProperty(this.apiKeyFreeze, false)
-				},
-			},
-			testPatternToggle: {
-				name: 'Test Pattern Toggle',
-				options: [],
-				callback: (action, controlId) => {
-					this.testPatternToggleAction(action)
-				},
-			},
-			testPatternEnable: {
-				name: 'Test Pattern Enable',
-				options: [],
-				callback: (action, controlId) => {
-					this.setProcessorProperty(this.apiKeyTestPattern, true)
-				},
-			},
-			testPatternDisable: {
-				name: 'Test Pattern Disable',
-				options: [],
-				callback: (action, controlId) => {
-					this.setProcessorProperty(this.apiKeyTestPattern, false)
-				},
-			},
-			testPatternFormatSelect: {
-				name: 'Test Pattern Format Select',
-				options: [
-					{
-						type: 'dropdown',
-						label: 'Format',
-						id: 'format',
-						default: 'from-input',
-						tooltip: 'Test pattern format',
-						choices: [
-							{ id: 'from-input', label: 'From Input' },
-							{ id: 'standard-dynamic-range', label: 'Standard Dynamic Range' },
-							{ id: 'perceptual-quantiser', label: 'Perceptual Quantiser' },
-							{ id: 'hybrid-log-gamma', label: 'Hybrid Log Gamma' },
-						],
-					},
-				],
-				callback: (action, controlId) => {
-					this.setProcessorProperty(this.apiKeyTestPatternFormat, action.options.format)
-				},
-			},
-			testPatternTypeSelect: {
-				name: 'Test Pattern Type Select',
-				options: [
-					{
-						type: 'dropdown',
-						label: 'Type',
-						id: 'type',
-						default: 'brompton',
-						tooltip: 'Test pattern type',
-						choices: [
-							{ id: 'brompton', label: 'Brompton' },
-							{ id: 'brompton-overlay', label: 'Brompton Overlay' },
-							{ id: 'red', label: 'Red' },
-							{ id: 'green', label: 'Green' },
-							{ id: 'blue', label: 'Blue' },
-							{ id: 'cyan', label: 'Cyan' },
-							{ id: 'magenta', label: 'Magenta' },
-							{ id: 'yellow', label: 'Yellow' },
-							{ id: 'white', label: 'White' },
-							{ id: 'black', label: 'Black' },
-							{ id: 'grid', label: 'Grid' },
-							{ id: 'scrolling-grid', label: 'Scrolling Grid' },
-							{ id: 'checkerboard', label: 'Checkerboard' },
-							{ id: 'scrolling-checkerboard', label: 'Scrolling Checkerboard' },
-							{ id: 'colour-bars', label: 'Colour Bars' },
-							{ id: 'gamma', label: 'Gamma' },
-							{ id: 'gradient', label: 'Gradient' },
-							{ id: 'scrolling-gradient', label: 'Scrolling Gradient' },
-							{ id: 'strobe', label: 'Strobe' },
-							{ id: 'smpte-bars', label: 'SMPTE Bars' },
-							{ id: 'scrolling-smpte-bars', label: 'Scrolling SMPTE Bars' },
-							{ id: 'custom', label: 'custom' },
-							{ id: 'forty-five-degree-grid', label: '45 Degree Grid' },
-							{ id: 'scrolling-forty-five-degree-grid', label: 'Scrolling 45 Degree Grid' },
-						],
-					},
-				],
-				callback: (action, controlId) => {
-					this.setProcessorProperty(this.apiKeyTestPatternType, action.options.type)
-				},
-			},
-			inputPortNumberSelect: {
-				name: 'Input Port Number Select',
-				options: [
-					{
-						type: 'dropdown',
-						label: 'Port Number',
-						id: 'portNumber',
-						default: '1',
-						tooltip: 'Input port number',
-						choices: [
-							{ id: '1', label: '1' },
-							{ id: '2', label: '2' },
-						],
-					},
-				],
-				callback: (action, controlId) => {
-					this.setProcessorProperty(this.apiKeyInputPortNumber, action.options.portNumber)
-				},
-			},
-			inputPortTypeSelect: {
-				name: 'Input Port Type Select',
-				options: [
-					{
-						type: 'dropdown',
-						label: 'Port Type',
-						id: 'portType',
-						default: 'dvi',
-						tooltip: 'Input port type',
-						choices: [
-							{ id: 'dvi', label: 'DVI' },
-							{ id: 'hdmi', label: 'HDMI' },
-							{ id: 'sdi', label: 'SDI' },
-						],
-					},
-				],
-				callback: (action, controlId) => {
-					this.setProcessorProperty(this.apiKeyInputPortType, action.options.portType)
-				},
-			},
+
+			// System
 		})
 	}
 
@@ -884,10 +895,87 @@ class BromptonInstance extends InstanceBase {
 			this.log('error', msg)
 		}
 	}
+	setValidatedPropertyFloat(value, min, max, label, apiKey) {
+		try {
+			validateFloat(value, min, max, label)
+			this.setProcessorProperty(apiKey, value)
+		} catch (error) {
+			let msg = 'Action ' + label + ' failed'
+			if (error.message && error.message.length > 0) {
+				msg += ' (' + error.message + ')'
+			}
+			this.log('error', msg)
+		}
+	}
 
+	// -------- Actions --------
+	toggleAction(action, apiKey, feature) {
+		if (action.options.mode === 'enable') {
+			this.setProcessorProperty(apiKey, true)
+		} else if (action.options.mode === 'disable') {
+			this.setProcessorProperty(apiKey, false)
+		} else {
+			try {
+				let enabled = getProperty(this.state, apiKey)
+
+				if (enabled === undefined) {
+					throw new Error(feature + ' state is not available')
+				}
+
+				this.setProcessorProperty(apiKey, !enabled)
+			} catch (error) {
+				let msg = 'Action ' + action.actionId + ' failed'
+				if (error.message && error.message.length > 0) {
+					msg += ' (' + error.message + ')'
+				}
+				this.log('error', msg)
+			}
+		}
+	}
+
+	// Input
+	// Processing
+
+	// Override
+	// Colour & Output
+	outputBrightnessIncreaseOrDecreaseAction(action) {
+		try {
+			let description = getActionDescription(action.actionId)
+
+			validate(action.options.step, minBrightnessStep, maxBrightnessStep, description)
+
+			let brightness = getProperty(this.state, apiKeys.outputBrightness)
+
+			if (brightness === undefined) {
+				throw new Error('Output Brightness is not available')
+			}
+
+			brightness = parseInt(brightness)
+
+			if (action.actionId == 'outputBrightnessIncrease') {
+				brightness += action.options.step
+			} else {
+				brightness -= action.options.step
+			}
+
+			brightness = clamp(brightness, minBrightness, maxBrightness)
+
+			this.setProcessorProperty(apiKeys.outputBrightness, brightness)
+		} catch (error) {
+			let msg = 'Action ' + action.actionId + ' failed'
+			if (error.message && error.message.length > 0) {
+				msg += ' (' + error.message + ')'
+			}
+			this.log('error', msg)
+		}
+	}
+	// Network
+	// Camera
+
+	// Presets
 	presetNextOrPreviousAction(action) {
 		try {
-			let preset = getProperty(this.state, this.apiKeyActivePresetNumber)
+			let preset = getProperty(this.state, apiKeys.activePresetNumber)
 
 			if (preset === undefined) {
 				throw new Error('Active Preset Number is not available')
@@ -921,7 +1009,7 @@ class BromptonInstance extends InstanceBase {
 				index = 0 // Wrap around.
 			}
 
-			this.setProcessorProperty(this.apiKeyActivePresetNumber, listOfPresets[index])
+			this.setProcessorProperty(apiKeys.activePresetNumber, listOfPresets[index])
 		} catch (error) {
 			let msg = 'Action ' + action.actionId + ' failed'
 			if (error.message && error.message.length > 0) {
@@ -931,43 +1019,7 @@ class BromptonInstance extends InstanceBase {
 		}
 	}
 
-	outputBrightnessIncreaseDecreaseAction(action) {
-		try {
-			let description
-			if (action.actionId == 'outputBrightnessIncrease') {
-				description = 'Increase Amount'
-			} else {
-				description = 'Decrease Amount'
-			}
-
-			validate(action.options.step, minBrightnessStep, maxBrightnessStep, description)
-
-			let brightness = getProperty(this.state, this.apiKeyOutputBrightness)
-
-			if (brightness === undefined) {
-				throw new Error('Output Brightness is not available')
-			}
-
-			brightness = parseInt(brightness)
-
-			if (action.actionId == 'outputBrightnessIncrease') {
-				brightness += action.options.step
-			} else {
-				brightness -= action.options.step
-			}
-
-			brightness = clamp(brightness, minBrightness, maxBrightness)
-
-			this.setProcessorProperty(this.apiKeyOutputBrightness, brightness)
-		} catch (error) {
-			let msg = 'Action ' + action.actionId + ' failed'
-			if (error.message && error.message.length > 0) {
-				msg += ' (' + error.message + ')'
-			}
-			this.log('error', msg)
-		}
-	}
-
+	// Groups
 	groupBrightnessSelectAction(action) {
 		try {
 			validate(action.options.group, minGroupNumber, maxGroupNumber, 'Group Number')
@@ -986,15 +1038,8 @@ class BromptonInstance extends InstanceBase {
 		try {
 			validate(action.options.group, minGroupNumber, maxGroupNumber, 'Group Number')
 
-			let description
-			if (action.actionId == 'groupBrightnessIncrease') {
-				description = 'Increase Amount'
-			} else {
-				description = 'Decrease Amount'
-			}
-
+			let description = getActionDescription(action.actionId)
 			validate(action.options.step, minBrightnessStep, maxBrightnessStep, description)
-
 			let brightness = getProperty(this.state, apiKeyGroupBrightness(action.options.group))
 
 			if (brightness === undefined) {
@@ -1012,60 +1057,6 @@ class BromptonInstance extends InstanceBase {
 			brightness = clamp(brightness, minBrightness, maxBrightness)
 
 			this.setProcessorProperty(apiKeyGroupBrightness(action.options.group), brightness)
-		} catch (error) {
-			let msg = 'Action ' + action.actionId + ' failed'
-			if (error.message && error.message.length > 0) {
-				msg += ' (' + error.message + ')'
-			}
-			this.log('error', msg)
-		}
-	}
-
-	blackoutToggleAction(action) {
-		try {
-			let enabled = getProperty(this.state, this.apiKeyBlackout)
-
-			if (enabled === undefined) {
-				throw new Error('Blackout state is not available')
-			}
-
-			this.setProcessorProperty(this.apiKeyBlackout, !enabled)
-		} catch (error) {
-			let msg = 'Action ' + action.actionId + ' failed'
-			if (error.message && error.message.length > 0) {
-				msg += ' (' + error.message + ')'
-			}
-			this.log('error', msg)
-		}
-	}
-
-	freezeToggleAction(action) {
-		try {
-			let enabled = getProperty(this.state, this.apiKeyFreeze)
-
-			if (enabled === undefined) {
-				throw new Error('Freeze state is not available')
-			}
-
-			this.setProcessorProperty(this.apiKeyFreeze, !enabled)
-		} catch (error) {
-			let msg = 'Action ' + action.actionId + ' failed'
-			if (error.message && error.message.length > 0) {
-				msg += ' (' + error.message + ')'
-			}
-			this.log('error', msg)
-		}
-	}
-
-	testPatternToggleAction() {
-		try {
-			let enabled = getProperty(this.state, this.apiKeyTestPattern)
-
-			if (enabled === undefined) {
-				throw new Error('Test Pattern state is not available')
-			}
-
-			this.setProcessorProperty(this.apiKeyTestPattern, !enabled)
 		} catch (error) {
 			let msg = 'Action ' + action.actionId + ' failed'
 			if (error.message && error.message.length > 0) {
