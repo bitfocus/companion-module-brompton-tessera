@@ -1,6 +1,6 @@
 'use strict'
 
-const instance_skel = require('../../instance_skel')
+const { InstanceBase, Regex, runEntrypoint, InstanceStatus } = require('@companion-module/base')
 const request = require('request')
 
 // Constants
@@ -68,38 +68,36 @@ function rangeToString(min, max) {
 	return '(' + min + '-' + max + ' inclusive)'
 }
 
-class BromptonInstance extends instance_skel {
-	constructor(system, id, config) {
-		super(system, id, config)
+class BromptonInstance extends InstanceBase {
+	constructor(internal) {
+		super(internal)
+	}
+
+	async init(config) {
+		this.config = config
+		this.updateStatus(InstanceStatus.Ok)
 
 		// Variables
 		this.timer = undefined
 		this.loggedError = false // Stops the poll flooding the log
 		this.timestampOfRequest = Date.now()
 
+		this.initVariables()
 		this.initActions()
+		this.startPolling()
 	}
 
-	destroy() {
+	async destroy() {
 		let self = this
 		self.stopPolling()
-		self.debug('destroy')
+		self.log('debug', 'destroy')
 	}
 
-	updateConfig(config) {
+	async configUpdated(config) {
 		let self = this
 
 		self.config = config
 		self.initActions()
-		self.initVariables()
-		self.startPolling()
-	}
-
-	init() {
-		let self = this
-
-		self.status(self.STATE_OK)
-
 		self.initVariables()
 		self.startPolling()
 	}
@@ -132,7 +130,7 @@ class BromptonInstance extends instance_skel {
 			if (self.loggedError === false) {
 				let msg = 'IP is not set'
 				self.log('error', msg)
-				self.status(self.STATUS_WARNING, msg)
+				self.updateStatus('bad_config', msg)
 				self.loggedError = true
 			}
 
@@ -167,7 +165,7 @@ class BromptonInstance extends instance_skel {
 					}
 
 					self.log('error', msg)
-					self.status(self.STATUS_ERROR, msg)
+					self.updateStatus('connection_failure', msg)
 					self.loggedError = true
 				}
 				self.updateVariables({})
@@ -177,7 +175,7 @@ class BromptonInstance extends instance_skel {
 			// Made a successful request.
 			if (self.loggedError === true) {
 				self.log('info', 'HTTP connection succeeded')
-				self.status(self.STATUS_OK)
+				self.updateStatus('ok')
 				self.loggedError = false
 			}
 
@@ -192,7 +190,7 @@ class BromptonInstance extends instance_skel {
 		})
 	}
 
-	config_fields() {
+	getConfigFields() {
 		let self = this
 		return [
 			{
@@ -201,7 +199,7 @@ class BromptonInstance extends instance_skel {
 				label: 'IP',
 				default: '',
 				width: 12,
-				regex: self.REGEX_IP,
+				regex: Regex.IP,
 			},
 			{
 				type: 'textinput',
@@ -248,15 +246,15 @@ class BromptonInstance extends instance_skel {
 
 		self.variableInfo = [
 			{
-				definition: { label: 'Active Preset Number', name: 'activePresetNumber' },
+				definition: { name: 'Active Preset Number', variableId: 'activePresetNumber' },
 				apiKey: self.apiKeyActivePresetNumber,
 			},
 			{
-				definition: { label: 'Active Preset Name', name: 'activePresetName' },
+				definition: { name: 'Active Preset Name', variableId: 'activePresetName' },
 				apiKey: self.apiKeyActivePresetName,
 			},
 			{
-				definition: { label: 'Output Brightness', name: 'outputBrightness' },
+				definition: { name: 'Output Brightness', variableId: 'outputBrightness' },
 				apiKey: self.apiKeyOutputBrightness,
 			},
 			{
@@ -280,34 +278,34 @@ class BromptonInstance extends instance_skel {
 				apiKey: self.apiKeyOutputBrightness,
 			},
 			{
-				definition: { label: 'Blackout', name: 'blackout' },
+				definition: { name: 'Blackout', variableId: 'blackout' },
 				apiKey: self.apiKeyBlackout,
 				transform: convertBool,
 			},
 			{
-				definition: { label: 'Freeze', name: 'freeze' },
+				definition: { name: 'Freeze', variableId: 'freeze' },
 				apiKey: self.apiKeyFreeze,
 				transform: convertBool,
 			},
 			{
-				definition: { label: 'Test Pattern', name: 'testPattern' },
+				definition: { name: 'Test Pattern', variableId: 'testPattern' },
 				apiKey: self.apiKeyTestPattern,
 				transform: convertBool,
 			},
 			{
-				definition: { label: 'Test Pattern Format', name: 'testPatternFormat' },
+				definition: { name: 'Test Pattern Format', variableId: 'testPatternFormat' },
 				apiKey: self.apiKeyTestPatternFormat,
 			},
 			{
-				definition: { label: 'Test Pattern Type', name: 'testPatternType' },
+				definition: { name: 'Test Pattern Type', variableId: 'testPatternType' },
 				apiKey: self.apiKeyTestPatternType,
 			},
 			{
-				definition: { label: 'Input Port Number', name: 'inputPortNumber' },
+				definition: { name: 'Input Port Number', variableId: 'inputPortNumber' },
 				apiKey: self.apiKeyInputPortNumber,
 			},
 			{
-				definition: { label: 'Input Port Type', name: 'inputPortType' },
+				definition: { name: 'Input Port Type', variableId: 'inputPortType' },
 				apiKey: self.apiKeyInputPortType,
 			},
 
@@ -342,7 +340,9 @@ class BromptonInstance extends instance_skel {
 		for (let i = 0; i < self.variableInfo.length; ++i) {
 			const info = self.variableInfo[i]
 			if (info.apiKey.length > 1 && info.apiKey[1] === 'groups') {
-				self.setVariable(info.definition.name, undefined)
+				self.setVariableValues({
+					[info.definition.variableId]: undefined,
+				})
 				groupsIndices.push(i)
 			}
 		}
@@ -357,7 +357,7 @@ class BromptonInstance extends instance_skel {
 
 		for (let group of self.groups) {
 			self.variableInfo.push({
-				definition: { label: 'Group ' + group + ' Brightness', name: 'groupBrightness' + group },
+				definition: { name: 'Group ' + group + ' Brightness', variableId: 'groupBrightness' + group },
 				apiKey: apiKeyGroupBrightness(group),
 			})
 		}
@@ -384,7 +384,7 @@ class BromptonInstance extends instance_skel {
 			}
 
 			//THIS ADDS SUPPORT FOR OUTPUT BRIGHTNESS PERCENTAGE BY TAKING OUTPUT BRIGHTNESS DIVIDED BY MAX BRIGHTNESS
-			if (info.definition.name === 'outputBrightnessPercentage') {
+			if (info.definition.variableId === 'outputBrightnessPercentage') {
 				result = getProperty(state, self.apiKeyOutputBrightness)
 				if (result === undefined) {
 					result = '?'
@@ -393,9 +393,10 @@ class BromptonInstance extends instance_skel {
 					result = result.toFixed(1) //rounds to 1 decimal place
 				}
 			}
-			//////
 
-			self.setVariable(info.definition.name, result)
+			self.setVariableValues({
+				[info.definition.variableId]: result,
+			})
 		}
 	}
 
@@ -431,16 +432,16 @@ class BromptonInstance extends instance_skel {
 		})
 	}
 
-	initActions(system) {
+	initActions() {
 		let self = this
 
 		const presetRange = rangeToString(minPreset, maxPreset)
 		const brightnessRange = rangeToString(minBrightness, maxBrightness)
 		const brightnessStepRange = rangeToString(minBrightnessStep, maxBrightnessStep)
 
-		self.setActions({
+		self.setActionDefinitions({
 			presetSelect: {
-				label: 'Preset Select',
+				name: 'Preset Select',
 				options: [
 					{
 						type: 'number',
@@ -455,7 +456,7 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.setValidatedProperty(
 						action.options.presetNumber,
 						minPreset,
@@ -466,21 +467,21 @@ class BromptonInstance extends instance_skel {
 				},
 			},
 			presetNext: {
-				label: 'Preset Next',
+				name: 'Preset Next',
 				options: [],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.presetNextOrPreviousAction(action)
 				},
 			},
 			presetPrevious: {
-				label: 'Preset Previous',
+				name: 'Preset Previous',
 				options: [],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.presetNextOrPreviousAction(action)
 				},
 			},
 			outputBrightnessSelect: {
-				label: 'Output Brightness Select',
+				name: 'Output Brightness Select',
 				options: [
 					{
 						type: 'number',
@@ -495,7 +496,7 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.setValidatedProperty(
 						action.options.brightness,
 						minBrightness,
@@ -506,14 +507,14 @@ class BromptonInstance extends instance_skel {
 				},
 			},
 			outputBrightnessSetToMax: {
-				label: 'Output Brightness Set To Common Maximum',
+				name: 'Output Brightness Set To Common Maximum',
 				options: [],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.setProcessorProperty(this.apiKeyOutputBrightness, -1)
 				},
 			},
 			outputBrightnessIncrease: {
-				label: 'Output Brightness Increase',
+				name: 'Output Brightness Increase',
 				options: [
 					{
 						type: 'number',
@@ -528,12 +529,12 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
-				callback: (action, bank) => {
-					this.brightnessIncreaseOrDecreaseAction(action)
+				callback: (action, controlId) => {
+					this.outputBrightnessIncreaseOrDecreaseAction(action)
 				},
 			},
 			outputBrightnessDecrease: {
-				label: 'Output Brightness Decrease',
+				name: 'Output Brightness Decrease',
 				options: [
 					{
 						type: 'number',
@@ -548,8 +549,8 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
-				callback: (action, bank) => {
-					this.brightnessIncreaseOrDecreaseAction(action)
+				callback: (action, controlId) => {
+					this.outputBrightnessIncreaseOrDecreaseAction(action)
 				},
 			},
 			outputTemperatureSelect: {
@@ -604,7 +605,7 @@ class BromptonInstance extends instance_skel {
 				],
 			},
 			groupBrightnessSelect: {
-				label: 'Group Brightness Select',
+				name: 'Group Brightness Select',
 				options: [
 					{
 						type: 'number',
@@ -631,12 +632,12 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.groupBrightnessSelectAction(action)
 				},
 			},
 			groupBrightnessIncrease: {
-				label: 'Group Brightness Increase',
+				name: 'Group Brightness Increase',
 				options: [
 					{
 						type: 'number',
@@ -663,12 +664,12 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.groupBrightnessIncreaseOrDecreaseAction(action)
 				},
 			},
 			groupBrightnessDecrease: {
-				label: 'Group Brightness Decrease',
+				name: 'Group Brightness Decrease',
 				options: [
 					{
 						type: 'number',
@@ -695,75 +696,75 @@ class BromptonInstance extends instance_skel {
 						range: false,
 					},
 				],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.groupBrightnessIncreaseOrDecreaseAction(action)
 				},
 			},
 			blackoutToggle: {
-				label: 'Blackout Toggle',
+				name: 'Blackout Toggle',
 				options: [],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.blackoutToggleAction(action)
 				},
 			},
 			blackoutEnable: {
-				label: 'Blackout Enable',
+				name: 'Blackout Enable',
 				options: [],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.setProcessorProperty(this.apiKeyBlackout, true)
 				},
 			},
 			blackoutDisable: {
-				label: 'Blackout Disable',
+				name: 'Blackout Disable',
 				options: [],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.setProcessorProperty(this.apiKeyBlackout, false)
 				},
 			},
 			freezeToggle: {
-				label: 'Freeze Toggle',
+				name: 'Freeze Toggle',
 				options: [],
-				callback: (action, bank) => {
-					this.freezeToggle(action)
+				callback: (action, controlId) => {
+					this.freezeToggleAction(action)
 				},
 			},
 			freezeEnable: {
-				label: 'Freeze Enable',
+				name: 'Freeze Enable',
 				options: [],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.setProcessorProperty(this.apiKeyFreeze, true)
 				},
 			},
 			freezeDisable: {
-				label: 'Freeze Disable',
+				name: 'Freeze Disable',
 				options: [],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.setProcessorProperty(this.apiKeyFreeze, false)
 				},
 			},
 			testPatternToggle: {
-				label: 'Test Pattern Toggle',
+				name: 'Test Pattern Toggle',
 				options: [],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.testPatternToggleAction(action)
 				},
 			},
 			testPatternEnable: {
-				label: 'Test Pattern Enable',
+				name: 'Test Pattern Enable',
 				options: [],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.setProcessorProperty(this.apiKeyTestPattern, true)
 				},
 			},
 			testPatternDisable: {
-				label: 'Test Pattern Disable',
+				name: 'Test Pattern Disable',
 				options: [],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.setProcessorProperty(this.apiKeyTestPattern, false)
 				},
 			},
 			testPatternFormatSelect: {
-				label: 'Test Pattern Format Select',
+				name: 'Test Pattern Format Select',
 				options: [
 					{
 						type: 'dropdown',
@@ -779,12 +780,12 @@ class BromptonInstance extends instance_skel {
 						],
 					},
 				],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.setProcessorProperty(this.apiKeyTestPatternFormat, action.options.format)
 				},
 			},
 			testPatternTypeSelect: {
-				label: 'Test Pattern Type Select',
+				name: 'Test Pattern Type Select',
 				options: [
 					{
 						type: 'dropdown',
@@ -820,12 +821,12 @@ class BromptonInstance extends instance_skel {
 						],
 					},
 				],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.setProcessorProperty(this.apiKeyTestPatternType, action.options.type)
 				},
 			},
 			inputPortNumberSelect: {
-				label: 'Input Port Number Select',
+				name: 'Input Port Number Select',
 				options: [
 					{
 						type: 'dropdown',
@@ -839,12 +840,12 @@ class BromptonInstance extends instance_skel {
 						],
 					},
 				],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.setProcessorProperty(this.apiKeyInputPortNumber, action.options.portNumber)
 				},
 			},
 			inputPortTypeSelect: {
-				label: 'Input Port Type Select',
+				name: 'Input Port Type Select',
 				options: [
 					{
 						type: 'dropdown',
@@ -859,7 +860,7 @@ class BromptonInstance extends instance_skel {
 						],
 					},
 				],
-				callback: (action, bank) => {
+				callback: (action, controlId) => {
 					this.setProcessorProperty(this.apiKeyInputPortType, action.options.portType)
 				},
 			},
@@ -903,7 +904,7 @@ class BromptonInstance extends instance_skel {
 			// Find the next/previous preset.
 			let index
 
-			if (action.action == 'presetNext') {
+			if (action.actionId == 'presetNext') {
 				listOfPresets.sort((x, y) => x - y)
 				index = listOfPresets.findIndex((x) => preset < x)
 			} else {
@@ -917,7 +918,7 @@ class BromptonInstance extends instance_skel {
 
 			this.setProcessorProperty(this.apiKeyActivePresetNumber, listOfPresets[index])
 		} catch (error) {
-			let msg = 'Action ' + action.action + ' failed'
+			let msg = 'Action ' + action.actionId + ' failed'
 			if (error.message && error.message.length > 0) {
 				msg += ' (' + error.message + ')'
 			}
@@ -928,7 +929,7 @@ class BromptonInstance extends instance_skel {
 	outputBrightnessIncreaseDecreaseAction(action) {
 		try {
 			let description
-			if (action.action == 'outputBrightnessIncrease') {
+			if (action.actionId == 'outputBrightnessIncrease') {
 				description = 'Increase Amount'
 			} else {
 				description = 'Decrease Amount'
@@ -944,7 +945,7 @@ class BromptonInstance extends instance_skel {
 
 			brightness = parseInt(brightness)
 
-			if (action.action == 'outputBrightnessIncrease') {
+			if (action.actionId == 'outputBrightnessIncrease') {
 				brightness += action.options.step
 			} else {
 				brightness -= action.options.step
@@ -954,7 +955,7 @@ class BromptonInstance extends instance_skel {
 
 			this.setProcessorProperty(this.apiKeyOutputBrightness, brightness)
 		} catch (error) {
-			let msg = 'Action ' + action.action + ' failed'
+			let msg = 'Action ' + action.actionId + ' failed'
 			if (error.message && error.message.length > 0) {
 				msg += ' (' + error.message + ')'
 			}
@@ -968,7 +969,7 @@ class BromptonInstance extends instance_skel {
 			validate(action.options.brightness, minBrightness, maxBrightness, 'Brightness')
 			this.setProcessorProperty(apiKeyGroupBrightness(action.options.group), action.options.brightness)
 		} catch (error) {
-			let msg = 'Action ' + action.action + ' failed'
+			let msg = 'Action ' + action.actionId + ' failed'
 			if (error.message && error.message.length > 0) {
 				msg += ' (' + error.message + ')'
 			}
@@ -981,7 +982,7 @@ class BromptonInstance extends instance_skel {
 			validate(action.options.group, minGroupNumber, maxGroupNumber, 'Group Number')
 
 			let description
-			if (action.action == 'groupBrightnessIncrease') {
+			if (action.actionId == 'groupBrightnessIncrease') {
 				description = 'Increase Amount'
 			} else {
 				description = 'Decrease Amount'
@@ -997,7 +998,7 @@ class BromptonInstance extends instance_skel {
 
 			brightness = parseInt(brightness)
 
-			if (action.action == 'groupBrightnessIncrease') {
+			if (action.actionId == 'groupBrightnessIncrease') {
 				brightness += action.options.step
 			} else {
 				brightness -= action.options.step
@@ -1007,7 +1008,7 @@ class BromptonInstance extends instance_skel {
 
 			this.setProcessorProperty(apiKeyGroupBrightness(action.options.group), brightness)
 		} catch (error) {
-			let msg = 'Action ' + action.action + ' failed'
+			let msg = 'Action ' + action.actionId + ' failed'
 			if (error.message && error.message.length > 0) {
 				msg += ' (' + error.message + ')'
 			}
@@ -1025,7 +1026,7 @@ class BromptonInstance extends instance_skel {
 
 			this.setProcessorProperty(this.apiKeyBlackout, !enabled)
 		} catch (error) {
-			let msg = 'Action ' + action.action + ' failed'
+			let msg = 'Action ' + action.actionId + ' failed'
 			if (error.message && error.message.length > 0) {
 				msg += ' (' + error.message + ')'
 			}
@@ -1043,7 +1044,7 @@ class BromptonInstance extends instance_skel {
 
 			this.setProcessorProperty(this.apiKeyFreeze, !enabled)
 		} catch (error) {
-			let msg = 'Action ' + action.action + ' failed'
+			let msg = 'Action ' + action.actionId + ' failed'
 			if (error.message && error.message.length > 0) {
 				msg += ' (' + error.message + ')'
 			}
@@ -1061,7 +1062,7 @@ class BromptonInstance extends instance_skel {
 
 			this.setProcessorProperty(this.apiKeyTestPattern, !enabled)
 		} catch (error) {
-			let msg = 'Action ' + action.action + ' failed'
+			let msg = 'Action ' + action.actionId + ' failed'
 			if (error.message && error.message.length > 0) {
 				msg += ' (' + error.message + ')'
 			}
@@ -1070,4 +1071,4 @@ class BromptonInstance extends instance_skel {
 	}
 }
 
-exports = module.exports = BromptonInstance
+runEntrypoint(BromptonInstance, [])

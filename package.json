@@ -1,32 +1,21 @@
 {
 	"name": "brompton-tessera",
-	"version": "1.0.5",
-	"api_version": "1.0.0",
-	"description": "Brompton Technology Tessera LED Processor Control",
-	"keywords": [
-		"brompton",
-		"tessera",
-		"processor",
-		"control",
-		"led",
-		"panel"
-	],
-	"manufacturer": "Brompton Technology",
-	"product": "Tessera LED Processor Control",
-	"shortname": "Tessera",
+	"version": "2.0.0",
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
-	"author": "Rahil Baber <rahilb@carallon.com>",
-	"contributors": [],
 	"license": "MIT",
-	"homepage": "https://github.com/bitfocus/companion-module-brompton-tessera#readme",
-	"bugs": {
-		"url": "https://github.com/bitfocus/companion-module-brompton-tessera/issues"
-	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/bitfocus/companion-module-brompton-tessera.git"
+	},
+	"dependencies": {
+		"@companion-module/base": "~1.4",
+		"companion-module-utils": "^0.3.1",
+		"request": "^2.88.2"
+	},
+	"devDependencies": {
+		"@companion-module/tools": "^1.4.1"
 	}
 }
