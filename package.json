@@ -3,7 +3,8 @@
 	"version": "2.0.0",
 	"main": "index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"format": "prettier --write ."
 	},
 	"license": "MIT",
 	"repository": {
@@ -11,11 +12,12 @@
 		"url": "git+https://github.com/bitfocus/companion-module-brompton-tessera.git"
 	},
 	"dependencies": {
-		"@companion-module/base": "~1.4",
+		"@companion-module/base": "^1.11.3",
 		"companion-module-utils": "^0.3.1",
 		"request": "^2.88.2"
 	},
 	"devDependencies": {
-		"@companion-module/tools": "^1.4.1"
+		"@companion-module/tools": "^2.1.1",
+		"prettier": "^3.5.1"
 	}
 }

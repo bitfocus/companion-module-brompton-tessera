@@ -21,15 +21,6 @@
 		"entrypoint": "../index.js"
 	},
 	"manufacturer": "Brompton Technology",
-	"products": [
-		"Tessera LED Processor Control"
-	],
-	"keywords": [
-		"brompton",
-		"tessera",
-		"processor",
-		"control",
-		"led",
-		"panel"
-	]
+	"products": ["Tessera LED Processor Control"],
+	"keywords": ["brompton", "tessera", "processor", "control", "led", "panel"]
 }

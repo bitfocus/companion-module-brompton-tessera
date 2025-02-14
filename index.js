@@ -906,7 +906,7 @@ class BromptonInstance extends InstanceBase {
 							{ id: 'checkerboard', label: 'Checkerboard' },
 							{ id: 'scrolling-checkerboard', label: 'Scrolling Checkerboard' },
 							{ id: 'colour-bars', label: 'Colour Bars' },
-							{ id: 'scrolling-colour-bars', label: 'Scrolling Colour Bars'},
+							{ id: 'scrolling-colour-bars', label: 'Scrolling Colour Bars' },
 							{ id: 'gradient', label: 'Gradient' },
 							{ id: 'scrolling-gradient', label: 'Scrolling Gradient' },
 							{ id: 'strobe', label: 'Strobe' },
@@ -947,7 +947,7 @@ class BromptonInstance extends InstanceBase {
 						minFrameStore,
 						maxFrameStore,
 						'Frame Store Number',
-						apiKeys.testPatternType
+						apiKeys.testPatternType,
 					)
 				},
 			},
@@ -973,7 +973,7 @@ class BromptonInstance extends InstanceBase {
 						minFrameStore,
 						maxFrameStore,
 						'Frame Store Number',
-						apiKeys.frameStoreCapture
+						apiKeys.frameStoreCapture,
 					)
 				},
 			},
@@ -1001,7 +1001,7 @@ class BromptonInstance extends InstanceBase {
 						minBrightness,
 						maxBrightness,
 						'Brightness',
-						apiKeys.outputBrightness
+						apiKeys.outputBrightness,
 					)
 				},
 			},
@@ -1254,7 +1254,7 @@ class BromptonInstance extends InstanceBase {
 						minColourTemperature,
 						maxColourTemperature,
 						'Colour Temperature',
-						apiKeys.outputColourTemperature
+						apiKeys.outputColourTemperature,
 					)
 				},
 			},
@@ -1351,7 +1351,7 @@ class BromptonInstance extends InstanceBase {
 						minPhaseOffsetAngle,
 						maxPhaseOffsetAngle,
 						'Phase Offset',
-						apiKeys.phaseOffsetAngle
+						apiKeys.phaseOffsetAngle,
 					)
 				},
 			},
@@ -1377,7 +1377,7 @@ class BromptonInstance extends InstanceBase {
 						minPhaseOffsetFraction,
 						maxPhaseOffsetFraction,
 						'Phase Offset',
-						apiKeys.phaseOffsetFraction
+						apiKeys.phaseOffsetFraction,
 					)
 				},
 			},
@@ -1501,7 +1501,7 @@ class BromptonInstance extends InstanceBase {
 						minShutterSyncAngle,
 						maxShutterSyncAngle,
 						'ShutterSync',
-						apiKeys.shutterSyncAngle
+						apiKeys.shutterSyncAngle,
 					)
 				},
 			},
@@ -1527,7 +1527,7 @@ class BromptonInstance extends InstanceBase {
 						minShutterSyncSpeed,
 						maxShutterSyncSpeed,
 						'ShutterSync',
-						apiKeys.shutterSyncSpeed
+						apiKeys.shutterSyncSpeed,
 					)
 				},
 			},
@@ -1553,7 +1553,7 @@ class BromptonInstance extends InstanceBase {
 						minShutterSyncTime,
 						maxShutterSyncTime,
 						'ShutterSync',
-						apiKeys.shutterSyncTime
+						apiKeys.shutterSyncTime,
 					)
 				},
 			},
@@ -1659,7 +1659,7 @@ class BromptonInstance extends InstanceBase {
 						minPreset,
 						maxPreset,
 						'Preset Number',
-						apiKeys.activePresetNumber
+						apiKeys.activePresetNumber,
 					)
 				},
 			},
