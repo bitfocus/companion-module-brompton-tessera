@@ -463,6 +463,123 @@ class BromptonInstance extends InstanceBase {
 			},
 
 			// Group Brightness variables are added by self.updateGroupDefinitions().
+
+			// Fan Status/Speeds
+			{
+				definition: { name: 'Case Fan 1 Speed', variableId: 'caseFan1Speed' },
+				apiKey: apiKeys.caseFan1Speed,
+			},
+			{
+				definition: { name: 'Case Fan 1 Status', variableId: 'caseFan1Status' },
+				apiKey: apiKeys.caseFan1Status,
+			},
+			{
+				definition: { name: 'Case Fan 2 Speed', variableId: 'caseFan2Speed' },
+				apiKey: apiKeys.caseFan2Speed,
+			},
+			{
+				definition: { name: 'Case Fan 2 Status', variableId: 'caseFan2Status' },
+				apiKey: apiKeys.caseFan2Status,
+			},
+			{
+				definition: { name: 'FPGA Fan Speed', variableId: 'fpgaFanSpeed' },
+				apiKey: apiKeys.fpgaFanSpeed,
+			},
+			{
+				definition: { name: 'FPGA Fan Status', variableId: 'fpgaFanStatus' },
+				apiKey: apiKeys.fpgaFanStatus,
+			},
+
+			//Temperatures
+			{
+				definition: { name: 'Ambient Temperature', variableId: 'ambientTemperature' },
+				apiKey: apiKeys.ambientTemperature,
+			},
+			{
+				definition: { name: 'CPU Temperature', variableId: 'cpuTemperature' },
+				apiKey: apiKeys.cpuTemperature,
+			},
+			{
+				definition: { name: 'DSP Temperature', variableId: 'dspTemperature' },
+				apiKey: apiKeys.dspTemperature,
+			},
+			{
+				definition: { name: 'Ethernet Copper A Temperature', variableId: 'ethernetCopperATemperature' },
+				apiKey: apiKeys.ethernetCopperATemperature,
+			},
+			{
+				definition: { name: 'Ethernet Copper B Temperature', variableId: 'ethernetCopperBTemperature' },
+				apiKey: apiKeys.ethernetCopperBTemperature,
+			},
+			{
+				definition: { name: 'Ethernet SFP A Temperature', variableId: 'ethernetSFPATemperature' },
+				apiKey: apiKeys.ethernetSFPATemperature,
+			},
+			{
+				definition: { name: 'Ethernet SFP B Temperature', variableId: 'ethernetSFPBTemperature' },
+				apiKey: apiKeys.ethernetSFPBTemperature,
+			},
+			{
+				definition: { name: 'Ethernet SFP C Temperature', variableId: 'ethernetSFPCTemperature' },
+				apiKey: apiKeys.ethernetSFPCTemperature,
+			},
+			{
+				definition: { name: 'Ethernet SFP D Temperature', variableId: 'ethernetSFPDTemperature' },
+				apiKey: apiKeys.ethernetSFPDTemperature,
+			},
+			{
+				definition: { name: 'FPGA Temperature', variableId: 'fpgaTemperature' },
+				apiKey: apiKeys.fpgaTemperature,
+			},
+			{
+				definition: { name: 'Front Temperature', variableId: 'frontTemperature' },
+				apiKey: apiKeys.frontTemperature,
+			},
+			{
+				definition: { name: 'GPU Temperature', variableId: 'gpuTemperature' },
+				apiKey: apiKeys.gpuTemperature,
+			},
+			{
+				definition: { name: 'Main Board Temperature', variableId: 'mainBoardTemperature' },
+				apiKey: apiKeys.mainBoardTemperature,
+			},
+			{
+				definition: { name: 'PSU Temperature', variableId: 'psuTemperature' },
+				apiKey: apiKeys.psuTemperature,
+			},
+			{
+				definition: { name: 'Rear Temperature', variableId: 'rearTemperature' },
+				apiKey: apiKeys.rearTemperature,
+			},
+
+			// System Information
+			{
+				definition: { name: 'Uptime', variableId: 'uptime' },
+				apiKey: apiKeys.uptime,
+			},
+			{
+				definition: { name: 'Serial Number', variableId: 'serialNumber' },
+				apiKey: apiKeys.serialNumber
+			},
+			{
+				definition: { name: 'Software Version', variableId: 'softwareVersion' },
+				apiKey: apiKeys.softwareVersion
+			},
+			{
+				definition: { name: 'Processor Name', variableId: 'processorName' },
+				apiKey: apiKeys.processorName
+			},
+			{
+				definition: { name: 'Processor Type', variableId: 'processorType' },
+				apiKey: apiKeys.processorType
+			},
+
+			//Project
+			{
+				definition: { name: 'Project Name', variableId: 'projectName' },
+				apiKey: apiKeys.projectName
+			},
+			
 		]
 
 		self.groups = []

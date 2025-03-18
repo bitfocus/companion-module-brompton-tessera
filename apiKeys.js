@@ -53,6 +53,41 @@ const apiKeys = {
 	// System
 	shutDown: ['api', 'system', 'actions', 'shutdown'],
 	reboot: ['api', 'system', 'actions', 'reboot'],
+
+	// Fan Status/Speeds
+	caseFan1Speed: ['api', 'system', 'fan',  'case', 'one', 'speed'],
+	caseFan1Status: ['api', 'system', 'fan', 'case', 'one', 'status'],
+	caseFan2Speed: ['api', 'system', 'fan', 'case', 'two', 'speed'],
+	caseFan2Status: ['api', 'system', 'fan', 'case', 'two', 'status'],
+	fpgaFanSpeed: ['api', 'system', 'fan', 'fpga', 'speed'],
+	fpgaFanStatus: ['api', 'system', 'fan', 'fpga', 'status'],
+
+	//Temperatures
+	ambientTemperature: ['api', 'system', 'temperature', 'ambient'],
+	cpuTemperature: ['api', 'system', 'temperature', 'cpu'],
+	dspTemperature: ['api', 'system', 'temperature', 'dsp'],
+	ethernetCopperATemperature: ['api', 'system', 'temperature', 'ethernet', 'copper', 'a'],
+	ethernetCopperBTemperature: ['api', 'system', 'temperature', 'ethernet', 'copper', 'b'],
+	ethernetSFPATemperature: ['api', 'system', 'temperature', 'ethernet', 'sfp', 'a'],
+	ethernetSFPBTemperature: ['api', 'system', 'temperature', 'ethernet', 'sfp', 'b'],
+	ethernetSFPCTemperature: ['api', 'system', 'temperature', 'ethernet', 'sfp', 'c'],
+	ethernetSFPDTemperature: ['api', 'system', 'temperature', 'ethernet', 'sfp', 'd'],
+	fpgaTemperature: ['api', 'system', 'temperature', 'fpga'],
+	frontTemperature: ['api', 'system', 'temperature', 'front'],
+	gpuTemperature: ['api', 'system', 'temperature', 'gpu'],
+	mainBoardTemperature: ['api', 'system', 'temperature', 'main'],
+	psuTemperature: ['api', 'system', 'temperature', 'psu'],
+	rearTemperature: ['api', 'system', 'temperature', 'rear'],
+
+	// System Information
+	uptime: ['api', 'system', 'uptime'],
+	serialNumber: ['api', 'system', 'serial-number'],
+	softwareVersion: ['api', 'system', 'software-version'],
+	processorName: ['api', 'system', 'processor-name'],
+	processorType: ['api', 'system', 'processor-type'],
+
+	//Project
+	projectName: ['api', 'project', 'name'],
 }
 
 module.exports = { apiKeys }
