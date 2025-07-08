@@ -404,6 +404,21 @@ class BromptonInstance extends InstanceBase {
 				apiKey: apiKeys.outputColourTemperature,
 			},
 			// Network
+			{
+				definition: { name: 'Failover Enabled', variableId: 'failoverEnabled' },
+				apiKey: apiKeys.failoverEnabled,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Failover Is Active', variableId: 'failoverIsActive' },
+				apiKey: apiKeys.failoverIsActive,
+				transform: convertBool,
+			},
+			{
+				definition: { name: 'Failover Partner Is Online', variableId: 'failoverPartnerIsOnline' },
+				apiKey: apiKeys.failoverPartnerIsOnline,
+				transform: convertBool,
+			},
 			// Camera
 			{
 				definition: { name: 'Phase Offset Mode', variableId: 'phaseOffsetMode' },
@@ -1438,6 +1453,26 @@ class BromptonInstance extends InstanceBase {
 				options: [],
 				callback: (action, controlId) => {
 					this.setProcessorProperty(apiKeys.requestFailover, '')
+				},
+			},
+			failoverEnabledToggle: {
+				name: 'Failover Enabled Toggle/Enable/Disable',
+				options: [
+					{
+						type: 'dropdown',
+						label: 'Mode',
+						id: 'mode',
+						default: 'toggle',
+						tooltip: 'Failover enabled toggle mode',
+						choices: [
+							{ id: 'toggle', label: 'Toggle' },
+							{ id: 'enable', label: 'Enable' },
+							{ id: 'disable', label: 'Disable' },
+						],
+					},
+				],
+				callback: (action, controlId) => {
+					this.toggleAction(action, apiKeys.failoverEnabled, 'Failover Enabled')
 				},
 			},
 

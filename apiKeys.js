@@ -32,6 +32,9 @@ const apiKeys = {
 
 	// Network
 	requestFailover: ['api', 'output', 'network', 'failover', 'actions', 'request-failover'],
+	failoverEnabled: ['api', 'output', 'network', 'failover', 'settings', 'enabled'],
+	failoverIsActive: ['api', 'output', 'network', 'failover', 'state', 'is-active'],
+	failoverPartnerIsOnline: ['api', 'output', 'network', 'failover', 'state', 'is-partner-present'],
 
 	// Camera
 	phaseOffsetMode: ['api', 'output', 'network', 'genlock', 'phase-offset', 'mode'],
