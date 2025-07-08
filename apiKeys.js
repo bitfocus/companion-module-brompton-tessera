@@ -88,6 +88,9 @@ const apiKeys = {
 
 	//Project
 	projectName: ['api', 'project', 'name'],
+
+	// Panels
+	onlinePanelCount: ['api', 'panels', 'statistics', 'online-count'],
 }
 
 module.exports = { apiKeys }

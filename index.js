@@ -579,6 +579,12 @@ class BromptonInstance extends InstanceBase {
 				definition: { name: 'Project Name', variableId: 'projectName' },
 				apiKey: apiKeys.projectName
 			},
+
+			// Panels
+			{
+				definition: { name: 'Online Panel Count', variableId: 'onlinePanelCount' },
+				apiKey: apiKeys.onlinePanelCount
+			},
 			
 		]
 
