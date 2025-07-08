@@ -585,6 +585,16 @@ class BromptonInstance extends InstanceBase {
 				definition: { name: 'Online Panel Count', variableId: 'onlinePanelCount' },
 				apiKey: apiKeys.onlinePanelCount
 			},
+
+			// Cable Loop Redundancy
+			{
+				definition: { name: 'Cable Loop Redundancy State 1', variableId: 'cableLoopRedundancyState1' },
+				apiKey: apiKeys.cableLoopRedundancyState1
+			},
+			{
+				definition: { name: 'Cable Loop Redundancy State 2', variableId: 'cableLoopRedundancyState2' },
+				apiKey: apiKeys.cableLoopRedundancyState2
+			},
 			
 		]
 

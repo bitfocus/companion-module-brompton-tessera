@@ -91,6 +91,10 @@ const apiKeys = {
 
 	// Panels
 	onlinePanelCount: ['api', 'panels', 'statistics', 'online-count'],
+
+	// Cable Loop Redundancy
+	cableLoopRedundancyState1: ['api', 'output', 'network', 'cable-redundancy', 'loops', '1', 'state'],
+	cableLoopRedundancyState2: ['api', 'output', 'network', 'cable-redundancy', 'loops', '2', 'state'],
 }
 
 module.exports = { apiKeys }
