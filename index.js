@@ -5,6 +5,7 @@ const request = require('request')
 const UpdatePresets = require('./presets')
 const UpgradeScripts = require('./upgrades.js')
 const { apiKeys } = require('./apiKeys.js')
+const { getFeedbacks } = require('./feedbacks.js')
 
 // Constants
 const pollIntervalMs = 1000
@@ -135,6 +136,7 @@ class BromptonInstance extends InstanceBase {
 
 		this.initVariables()
 		this.initActions()
+		this.initFeedbacks()
 		this.updatePresets() // export presets
 		this.startPolling()
 	}
@@ -150,6 +152,7 @@ class BromptonInstance extends InstanceBase {
 
 		self.config = config
 		self.initActions()
+		self.initFeedbacks()
 		self.initVariables()
 		self.startPolling()
 	}
@@ -574,43 +577,42 @@ class BromptonInstance extends InstanceBase {
 			},
 			{
 				definition: { name: 'Serial Number', variableId: 'serialNumber' },
-				apiKey: apiKeys.serialNumber
+				apiKey: apiKeys.serialNumber,
 			},
 			{
 				definition: { name: 'Software Version', variableId: 'softwareVersion' },
-				apiKey: apiKeys.softwareVersion
+				apiKey: apiKeys.softwareVersion,
 			},
 			{
 				definition: { name: 'Processor Name', variableId: 'processorName' },
-				apiKey: apiKeys.processorName
+				apiKey: apiKeys.processorName,
 			},
 			{
 				definition: { name: 'Processor Type', variableId: 'processorType' },
-				apiKey: apiKeys.processorType
+				apiKey: apiKeys.processorType,
 			},
 
 			//Project
 			{
 				definition: { name: 'Project Name', variableId: 'projectName' },
-				apiKey: apiKeys.projectName
+				apiKey: apiKeys.projectName,
 			},
 
 			// Panels
 			{
 				definition: { name: 'Online Panel Count', variableId: 'onlinePanelCount' },
-				apiKey: apiKeys.onlinePanelCount
+				apiKey: apiKeys.onlinePanelCount,
 			},
 
 			// Cable Loop Redundancy
 			{
 				definition: { name: 'Cable Loop Redundancy State 1', variableId: 'cableLoopRedundancyState1' },
-				apiKey: apiKeys.cableLoopRedundancyState1
+				apiKey: apiKeys.cableLoopRedundancyState1,
 			},
 			{
 				definition: { name: 'Cable Loop Redundancy State 2', variableId: 'cableLoopRedundancyState2' },
-				apiKey: apiKeys.cableLoopRedundancyState2
+				apiKey: apiKeys.cableLoopRedundancyState2,
 			},
-			
 		]
 
 		self.groups = []
@@ -700,6 +702,9 @@ class BromptonInstance extends InstanceBase {
 				[info.definition.variableId]: result,
 			})
 		}
+
+		// Update feedbacks when variables change
+		self.checkFeedbacks()
 	}
 
 	setProcessorProperty(apiKey, data) {
@@ -2295,6 +2300,10 @@ class BromptonInstance extends InstanceBase {
 			}
 			this.log('error', msg)
 		}
+	}
+
+	initFeedbacks() {
+		this.setFeedbackDefinitions(getFeedbacks(this))
 	}
 
 	updatePresets() {
