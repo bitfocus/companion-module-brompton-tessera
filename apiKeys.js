@@ -58,7 +58,7 @@ const apiKeys = {
 	reboot: ['api', 'system', 'actions', 'reboot'],
 
 	// Fan Status/Speeds
-	caseFan1Speed: ['api', 'system', 'fan',  'case', 'one', 'speed'],
+	caseFan1Speed: ['api', 'system', 'fan', 'case', 'one', 'speed'],
 	caseFan1Status: ['api', 'system', 'fan', 'case', 'one', 'status'],
 	caseFan2Speed: ['api', 'system', 'fan', 'case', 'two', 'speed'],
 	caseFan2Status: ['api', 'system', 'fan', 'case', 'two', 'status'],
