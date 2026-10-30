@@ -87,6 +87,10 @@ https://www.bromptontech.com/support/downloads/.
 #### Input
 - inputPortNumber
 - inputPortType
+- inputWidth
+- inputHeight
+- inputResolution (e.g. 1920x1080, or "No signal")
+- inputRefreshRate
 
 #### Processing
 - scaler
