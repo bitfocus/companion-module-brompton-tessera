@@ -11,333 +11,168 @@ function getFeedbacks(instance) {
 
 	return {
 		blackout: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Blackout Status',
 			description: 'Changes button style based on blackout status',
-			options: [
-				{
-					type: 'colorpicker',
-					label: 'Enabled - Background Color',
-					id: 'enabledBg',
-					default: combineRgb(255, 0, 0), // Red when enabled
-				},
-				{
-					type: 'colorpicker',
-					label: 'Disabled - Background Color',
-					id: 'disabledBg',
-					default: combineRgb(0, 0, 0), // Black when disabled
-				},
-			],
-			callback: (feedback) => {
+			defaultStyle: {
+				bgcolor: combineRgb(255, 0, 0), // Red when enabled
+				color: combineRgb(255, 255, 255),
+			},
+			options: [],
+			callback: () => {
 				const blackoutEnabled = getProperty(instance.state, apiKeys.blackout)
 
-				if (blackoutEnabled === undefined) {
-					return {}
-				}
-
-				return {
-					bgcolor: blackoutEnabled ? feedback.options.enabledBg : feedback.options.disabledBg,
-				}
+				return blackoutEnabled === true
 			},
 		},
 		freeze: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Freeze Status',
 			description: 'Changes button style based on freeze status',
-			options: [
-				{
-					type: 'colorpicker',
-					label: 'Enabled - Background Color',
-					id: 'enabledBg',
-					default: combineRgb(255, 0, 0), // Red when enabled
-				},
-				{
-					type: 'colorpicker',
-					label: 'Disabled - Background Color',
-					id: 'disabledBg',
-					default: combineRgb(0, 0, 0), // Black when disabled
-				},
-			],
-			callback: (feedback) => {
+			defaultStyle: {
+				bgcolor: combineRgb(255, 0, 0), // Red when enabled
+				color: combineRgb(255, 255, 255),
+			},
+			options: [],
+			callback: () => {
 				const freezeEnabled = getProperty(instance.state, apiKeys.freeze)
 
-				if (freezeEnabled === undefined) {
-					return {}
-				}
-
-				return {
-					bgcolor: freezeEnabled ? feedback.options.enabledBg : feedback.options.disabledBg,
-				}
+				return freezeEnabled === true
 			},
 		},
 		lut: {
-			type: 'advanced',
+			type: 'boolean',
 			name: '3D LUT Status',
 			description: 'Changes button style based on 3D LUT status',
-			options: [
-				{
-					type: 'colorpicker',
-					label: 'Enabled - Background Color',
-					id: 'enabledBg',
-					default: combineRgb(255, 0, 0), // Red when enabled
-				},
-				{
-					type: 'colorpicker',
-					label: 'Disabled - Background Color',
-					id: 'disabledBg',
-					default: combineRgb(0, 0, 0), // Black when disabled
-				},
-			],
-			callback: (feedback) => {
+			defaultStyle: {
+				bgcolor: combineRgb(255, 0, 0), // Red when enabled
+				color: combineRgb(255, 255, 255),
+			},
+			options: [],
+			callback: () => {
 				const lutEnabled = getProperty(instance.state, apiKeys.lut3d)
 
-				if (lutEnabled === undefined) {
-					return {}
-				}
-
-				return {
-					bgcolor: lutEnabled ? feedback.options.enabledBg : feedback.options.disabledBg,
-				}
+				return lutEnabled === true
 			},
 		},
 		colourReplace: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Colour Replace Status',
 			description: 'Changes button style based on colour replace status',
-			options: [
-				{
-					type: 'colorpicker',
-					label: 'Enabled - Background Color',
-					id: 'enabledBg',
-					default: combineRgb(255, 0, 0), // Red when enabled
-				},
-				{
-					type: 'colorpicker',
-					label: 'Disabled - Background Color',
-					id: 'disabledBg',
-					default: combineRgb(0, 0, 0), // Black when disabled
-				},
-			],
-			callback: (feedback) => {
+			defaultStyle: {
+				bgcolor: combineRgb(255, 0, 0), // Red when enabled
+				color: combineRgb(255, 255, 255),
+			},
+			options: [],
+			callback: () => {
 				const colourReplaceEnabled = getProperty(instance.state, apiKeys.colourReplace)
 
-				if (colourReplaceEnabled === undefined) {
-					return {}
-				}
-
-				return {
-					bgcolor: colourReplaceEnabled ? feedback.options.enabledBg : feedback.options.disabledBg,
-				}
+				return colourReplaceEnabled === true
 			},
 		},
 		darkMagic: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Dark Magic Status',
 			description: 'Changes button style based on dark magic status',
-			options: [
-				{
-					type: 'colorpicker',
-					label: 'Enabled - Background Color',
-					id: 'enabledBg',
-					default: combineRgb(255, 0, 0), // Red when enabled
-				},
-				{
-					type: 'colorpicker',
-					label: 'Disabled - Background Color',
-					id: 'disabledBg',
-					default: combineRgb(0, 0, 0), // Black when disabled
-				},
-			],
-			callback: (feedback) => {
+			defaultStyle: {
+				bgcolor: combineRgb(255, 0, 0), // Red when enabled
+				color: combineRgb(255, 255, 255),
+			},
+			options: [],
+			callback: () => {
 				const darkMagicEnabled = getProperty(instance.state, apiKeys.darkMagic)
 
-				if (darkMagicEnabled === undefined) {
-					return {}
-				}
-
-				return {
-					bgcolor: darkMagicEnabled ? feedback.options.enabledBg : feedback.options.disabledBg,
-				}
+				return darkMagicEnabled === true
 			},
 		},
 		failover: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Failover Enabled Status',
 			description: 'Changes button style based on failover enabled status',
-			options: [
-				{
-					type: 'colorpicker',
-					label: 'Enabled - Background Color',
-					id: 'enabledBg',
-					default: combineRgb(255, 0, 0), // Red when enabled
-				},
-				{
-					type: 'colorpicker',
-					label: 'Disabled - Background Color',
-					id: 'disabledBg',
-					default: combineRgb(0, 0, 0), // Black when disabled
-				},
-			],
-			callback: (feedback) => {
+			defaultStyle: {
+				bgcolor: combineRgb(255, 0, 0), // Red when enabled
+				color: combineRgb(255, 255, 255),
+			},
+			options: [],
+			callback: () => {
 				const failoverEnabled = getProperty(instance.state, apiKeys.failoverEnabled)
 
-				if (failoverEnabled === undefined) {
-					return {}
-				}
-
-				return {
-					bgcolor: failoverEnabled ? feedback.options.enabledBg : feedback.options.disabledBg,
-				}
+				return failoverEnabled === true
 			},
 		},
 		frameRemapping: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Frame Remapping Status',
 			description: 'Changes button style based on frame remapping status',
-			options: [
-				{
-					type: 'colorpicker',
-					label: 'Enabled - Background Color',
-					id: 'enabledBg',
-					default: combineRgb(255, 0, 0), // Red when enabled
-				},
-				{
-					type: 'colorpicker',
-					label: 'Disabled - Background Color',
-					id: 'disabledBg',
-					default: combineRgb(0, 0, 0), // Black when disabled
-				},
-			],
-			callback: (feedback) => {
+			defaultStyle: {
+				bgcolor: combineRgb(255, 0, 0), // Red when enabled
+				color: combineRgb(255, 255, 255),
+			},
+			options: [],
+			callback: () => {
 				const frameRemappingEnabled = getProperty(instance.state, apiKeys.frameRemapping)
 
-				if (frameRemappingEnabled === undefined) {
-					return {}
-				}
-
-				return {
-					bgcolor: frameRemappingEnabled ? feedback.options.enabledBg : feedback.options.disabledBg,
-				}
+				return frameRemappingEnabled === true
 			},
 		},
 		pureTone: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'PureTone Status',
 			description: 'Changes button style based on PureTone status',
-			options: [
-				{
-					type: 'colorpicker',
-					label: 'Enabled - Background Color',
-					id: 'enabledBg',
-					default: combineRgb(255, 0, 0), // Red when enabled
-				},
-				{
-					type: 'colorpicker',
-					label: 'Disabled - Background Color',
-					id: 'disabledBg',
-					default: combineRgb(0, 0, 0), // Black when disabled
-				},
-			],
-			callback: (feedback) => {
+			defaultStyle: {
+				bgcolor: combineRgb(255, 0, 0), // Red when enabled
+				color: combineRgb(255, 255, 255),
+			},
+			options: [],
+			callback: () => {
 				const pureToneEnabled = getProperty(instance.state, apiKeys.pureTone)
 
-				if (pureToneEnabled === undefined) {
-					return {}
-				}
-
-				return {
-					bgcolor: pureToneEnabled ? feedback.options.enabledBg : feedback.options.disabledBg,
-				}
+				return pureToneEnabled === true
 			},
 		},
 		testPattern: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Test Pattern Status',
 			description: 'Changes button style based on test pattern status',
-			options: [
-				{
-					type: 'colorpicker',
-					label: 'Enabled - Background Color',
-					id: 'enabledBg',
-					default: combineRgb(255, 0, 0), // Red when enabled
-				},
-				{
-					type: 'colorpicker',
-					label: 'Disabled - Background Color',
-					id: 'disabledBg',
-					default: combineRgb(0, 0, 0), // Black when disabled
-				},
-			],
-			callback: (feedback) => {
+			defaultStyle: {
+				bgcolor: combineRgb(255, 0, 0), // Red when enabled
+				color: combineRgb(255, 255, 255),
+			},
+			options: [],
+			callback: () => {
 				const testPatternEnabled = getProperty(instance.state, apiKeys.testPattern)
 
-				if (testPatternEnabled === undefined) {
-					return {}
-				}
-
-				return {
-					bgcolor: testPatternEnabled ? feedback.options.enabledBg : feedback.options.disabledBg,
-				}
+				return testPatternEnabled === true
 			},
 		},
 		scaler: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Scaler Status',
 			description: 'Changes button style based on scaler status',
-			options: [
-				{
-					type: 'colorpicker',
-					label: 'Enabled - Background Color',
-					id: 'enabledBg',
-					default: combineRgb(255, 0, 0), // Red when enabled
-				},
-				{
-					type: 'colorpicker',
-					label: 'Disabled - Background Color',
-					id: 'disabledBg',
-					default: combineRgb(0, 0, 0), // Black when disabled
-				},
-			],
-			callback: (feedback) => {
+			defaultStyle: {
+				bgcolor: combineRgb(255, 0, 0), // Red when enabled
+				color: combineRgb(255, 255, 255),
+			},
+			options: [],
+			callback: () => {
 				const scalerEnabled = getProperty(instance.state, apiKeys.scaler)
 
-				if (scalerEnabled === undefined) {
-					return {}
-				}
-
-				return {
-					bgcolor: scalerEnabled ? feedback.options.enabledBg : feedback.options.disabledBg,
-				}
+				return scalerEnabled === true
 			},
 		},
 		overdrive: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Overdrive Status',
 			description: 'Changes button style based on overdrive status',
-			options: [
-				{
-					type: 'colorpicker',
-					label: 'Enabled - Background Color',
-					id: 'enabledBg',
-					default: combineRgb(255, 0, 0), // Red when enabled
-				},
-				{
-					type: 'colorpicker',
-					label: 'Disabled - Background Color',
-					id: 'disabledBg',
-					default: combineRgb(0, 0, 0), // Black when disabled
-				},
-			],
-			callback: (feedback) => {
+			defaultStyle: {
+				bgcolor: combineRgb(255, 0, 0), // Red when enabled
+				color: combineRgb(255, 255, 255),
+			},
+			options: [],
+			callback: () => {
 				const overdriveEnabled = getProperty(instance.state, apiKeys.overdrive)
 
-				if (overdriveEnabled === undefined) {
-					return {}
-				}
-
-				return {
-					bgcolor: overdriveEnabled ? feedback.options.enabledBg : feedback.options.disabledBg,
-				}
+				return overdriveEnabled === true
 			},
 		},
 	}
