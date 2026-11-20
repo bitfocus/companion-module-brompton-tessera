@@ -55,6 +55,37 @@ function getProperty(object, path) {
 	return path.reduce((object, label) => object && object[label], object)
 }
 
+// Returns the live signal details of the active input from the polled state.
+// Tessera 3.5 firmware reports these per port at input/ports/<type>/<index>/meta-data,
+// where index = port-number - 1. The IP Control API document lists input/active/resolution,
+// which is used as a fallback.
+function getActiveInputMeta(state) {
+	const input = getProperty(state, ['api', 'input'])
+	if (input === undefined) return { ok: false, reason: '?' }
+
+	let width, height, refreshRate
+	const type = getProperty(input, ['active', 'source', 'port-type'])
+	const number = getProperty(input, ['active', 'source', 'port-number'])
+	const meta =
+		type !== undefined && number !== undefined
+			? getProperty(input, ['ports', String(type).toLowerCase(), String(Number(number) - 1), 'meta-data'])
+			: undefined
+
+	if (meta !== undefined) {
+		width = getProperty(meta, ['resolution', 'width'])
+		height = getProperty(meta, ['resolution', 'height'])
+		refreshRate = meta['refresh-rate']
+	} else {
+		width = getProperty(input, ['active', 'resolution', 'width'])
+		height = getProperty(input, ['active', 'resolution', 'height'])
+		refreshRate = getProperty(input, ['active', 'refresh-rate'])
+	}
+
+	if (width === undefined || height === undefined) return { ok: false, reason: '?' }
+	if (width <= 0 || height <= 0) return { ok: false, reason: 'No signal' }
+	return { ok: true, width, height, refreshRate }
+}
+
 function sortedArraysEqual(a, b) {
 	if (a.length !== b.length) {
 		return false
@@ -290,6 +321,39 @@ class BromptonInstance extends InstanceBase {
 			{
 				definition: { name: 'Input Port Type', variableId: 'inputPortType' },
 				apiKey: apiKeys.inputPortType,
+			},
+			{
+				definition: { name: 'Input Width', variableId: 'inputWidth' },
+				apiKey: apiKeys.inputWidth,
+				compute: (state) => {
+					const m = getActiveInputMeta(state)
+					return m.ok ? m.width : m.reason
+				},
+			},
+			{
+				definition: { name: 'Input Height', variableId: 'inputHeight' },
+				apiKey: apiKeys.inputHeight,
+				compute: (state) => {
+					const m = getActiveInputMeta(state)
+					return m.ok ? m.height : m.reason
+				},
+			},
+			{
+				definition: { name: 'Input Resolution (WxH)', variableId: 'inputResolution' },
+				apiKey: apiKeys.inputWidth,
+				compute: (state) => {
+					const m = getActiveInputMeta(state)
+					return m.ok ? m.width + 'x' + m.height : m.reason
+				},
+			},
+			{
+				definition: { name: 'Input Refresh Rate', variableId: 'inputRefreshRate' },
+				apiKey: apiKeys.inputRefreshRate,
+				compute: (state) => {
+					const m = getActiveInputMeta(state)
+					if (!m.ok) return m.reason
+					return typeof m.refreshRate === 'number' ? parseFloat(m.refreshRate.toFixed(3)).toString() : '?'
+				},
 			},
 			// Processing
 			{
@@ -677,7 +741,9 @@ class BromptonInstance extends InstanceBase {
 
 		for (let info of self.variableInfo) {
 			let result = getProperty(state, info.apiKey)
-			if (result === undefined) {
+			if (info.compute) {
+				result = info.compute(state)
+			} else if (result === undefined) {
 				result = '?'
 			} else {
 				if (info.transform) {

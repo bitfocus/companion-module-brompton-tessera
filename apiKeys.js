@@ -1,6 +1,9 @@
 const apiKeys = {
 	inputPortNumber: ['api', 'input', 'active', 'source', 'port-number'],
 	inputPortType: ['api', 'input', 'active', 'source', 'port-type'],
+	inputWidth: ['api', 'input', 'active', 'resolution', 'width'],
+	inputHeight: ['api', 'input', 'active', 'resolution', 'height'],
+	inputRefreshRate: ['api', 'input', 'active', 'refresh-rate'],
 
 	scaler: ['api', 'processing', 'scaler', 'enabled'],
 	colourReplace: ['api', 'processing', 'colour-replace', 'enabled'],
